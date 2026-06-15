@@ -1,20 +1,115 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# 🏢 معرض معمار مصر الرقمي 2026 - Expo MASR
 
-# Run and deploy your AI Studio app
+منصة رقمية تفاعلية لعرض الأجنحة الافتراضية والحجوزات الإلكترونية لمعرض معمار مصر 2026.
 
-This contains everything you need to run your app locally.
+## 🌟 الميزات الرئيسية
 
-View your app in AI Studio: https://ai.studio/apps/9d36d3f0-5b90-40c5-9f17-033b121a0a9e
+- 🎪 أجنحة رقمية تفاعلية للشركات والمؤسسات
+- 💼 نظام إدارة الحجوزات للأدمن
+- 📊 لوحة تحكم شاملة لعرض البيانات
+- 🔐 نظام تسجيل دخول آمن
+- 📱 تصميم متجاوب يعمل على جميع الأجهزة
+- 🌍 دعم الواجهة العربية
 
-## Run Locally
+## 📋 المتطلبات
 
-**Prerequisites:**  Node.js
+- Node.js (v18 أو أحدث)
+- Python 3.8+ (للـ Backend)
+- npm أو yarn
 
+## 🚀 التثبيت والتشغيل
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Frontend (React + TypeScript + Vite)
+
+```bash
+# تثبيت المتعلقات
+npm install
+
+# تشغيل خادم التطوير
+npm run dev
+
+# بناء النسخة الإنتاجية
+npm run build
+```
+
+### Backend (Flask)
+
+```bash
+# الانتقال إلى مجلد Backend
+cd backend
+
+# تثبيت المكتبات المطلوبة
+pip install -r requirements.txt
+
+# تشغيل الخادم
+python app.py
+```
+
+الخادم سيعمل على: `http://localhost:5000`
+
+## 🔑 متغيرات البيئة
+
+أنشئ ملف `.env.local` في الجذر:
+
+```env
+# Admin Credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_password
+
+# Backend URL
+VITE_API_URL=http://localhost:5000
+```
+
+## 📁 هيكل المشروع
+
+```
+expomasr/
+├── src/                    # الواجهة الأمامية (React)
+│   ├── components/         # مكونات React
+│   ├── assets/            # الصور والموارد
+│   ├── utils/             # دوال مساعدة
+│   └── main.tsx           # نقطة الدخول الرئيسية
+├── backend/               # خادم Python
+│   ├── app.py            # تطبيق Flask الرئيسي
+│   ├── bookings.db       # قاعدة البيانات
+│   └── templates/        # صفحات HTML
+├── public/               # الملفات الثابتة
+└── package.json          # المتعلقات الأمامية
+```
+
+## 🛠️ المتكاملات
+
+- **Flask** - خادم ويب Python
+- **React** - مكتبة بناء الواجهات
+- **TypeScript** - لغة برمجة مكتوبة بقوة
+- **Vite** - أداة بناء سريعة
+- **SQLite** - قاعدة بيانات خفيفة الوزن
+
+## 👤 حساب الأدمن
+
+الوصول إلى لوحة التحكم:
+- الرابط: `http://localhost:5000/admin/login`
+- اسم المستخدم: `admin`
+- كلمة المرور: تغيير عبر متغيرات البيئة
+
+## 📊 APIs المتاحة
+
+| الطلب | الرابط | الوصف |
+|------|--------|-------|
+| POST | `/api/bookings` | إنشاء حجز جديد |
+| GET | `/api/bookings` | استرجاع جميع الحجوزات |
+| GET | `/api/bookings/stats` | إحصائيات الحجوزات |
+| GET | `/admin/` | لوحة تحكم الأدمن |
+| GET | `/admin/export` | تصدير البيانات CSV |
+
+## 📝 الترخيص
+
+هذا المشروع مرخص تحت رخصة MIT. انظر ملف [LICENSE](LICENSE) للتفاصيل.
+
+## 👨‍💻 المساهمة
+
+نرحب بالمساهمات! يرجى إنشاء fork والمساهمة عبر pull requests.
+
+## 📞 التواصل
+
+للأسئلة والدعم الفني، يرجى فتح issue في المستودع.
