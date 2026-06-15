@@ -227,15 +227,28 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
     try {
       const ticketElement = ticketRef.current;
+      
+      // Create a clean clone to avoid oklab color issues
+      const clonedElement = ticketElement.cloneNode(true) as HTMLElement;
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'fixed';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '-9999px';
+      tempContainer.appendChild(clonedElement);
+      document.body.appendChild(tempContainer);
 
       // Capture the element using html2canvas
-      const canvas = await html2canvas(ticketElement, {
-        scale: 3, // Premium quality scale for crisp text rendering
+      const canvas = await html2canvas(clonedElement, {
+        scale: 2,
         useCORS: true,
-        backgroundColor: "#030b1a", // match bg-brand-blue-dark
+        backgroundColor: "#030b1a",
         logging: false,
         allowTaint: true,
+        foreignObjectContent: false,
       });
+      
+      // Clean up temporary element
+      document.body.removeChild(tempContainer);
 
       const imgData = canvas.toDataURL("image/png");
 
