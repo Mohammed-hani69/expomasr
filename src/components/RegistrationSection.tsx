@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SECTORS, PACKAGES } from '../data';
 import { RegistrationForm } from '../types';
-import { sendBookingToGoogleSheets, getGoogleSheetUrl } from '../utils/googleSheets';
+import { sendBookingToFlask } from '../utils/googleSheets';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 // @ts-ignore
@@ -132,23 +132,8 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
         date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       };
 
-      // Real asynchronous fetch to Google Sheet Script URL
-      let syncResponseSuccess = false;
-      const sheetUrl = getGoogleSheetUrl();
-      
-      if (sheetUrl) {
-        try {
-          const res = await sendBookingToGoogleSheets(ticketDetails);
-          if (res && res.success) {
-            syncResponseSuccess = true;
-            console.log('Successfully synced booking to Google Sheets in real-time');
-          } else {
-            console.warn('Sheets sync issues:', res.error);
-          }
-        } catch (sheetErr) {
-          console.error('Error connecting to Sheets API:', sheetErr);
-        }
-      }
+      // Save to Flask + SQLite backend
+      const syncResult = await sendBookingToFlask(ticketDetails);
 
       // Save to localStorage of the browser
       localStorage.setItem('arabic_expo_booking_2026', JSON.stringify(ticketDetails));
@@ -169,13 +154,15 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       });
       window.dispatchEvent(regLeadEvent);
 
-      // Sincere success alert to user verifying registration and Google Sheets delivery
+      const dbStatus = syncResult.success
+        ? 'تم الحفظ في قاعدة البيانات بنجاح ✅'
+        : `تحذير قاعدة البيانات: ${syncResult.error || 'فشل المزامنة'}`;
       alert(
         `🎉تم تأكيد وإرسال طلب حجز الجناح الرقمي بنجاح!\n\n` +
         `• كود الجناح: ${regId}\n` +
         `• الشركة المشتركة: ${formData.companyName}\n` +
         `• الباقة التسويقية: ${selectedPkgDetail.name}\n` +
-        `• حالة المزامنة مع Google Sheet: تم الإرسال بنجاح ✅`
+        `• ${dbStatus}`
       );
 
       setIsSubmitting(false);
@@ -585,12 +572,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                     المقعد محجوز بدفعة معلّقة
                   </span>
 
-                  {getGoogleSheetUrl() && (
-                    <span className="text-[10px] text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2 font-bold block w-fit">
-                      <CheckCircle className="w-3 h-3 text-[#d4af37]" />
-                      تمت المزامنة المباشرة مع Google Sheets بنجاح!
-                    </span>
-                  )}
+                  <span className="text-[10px] text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2 font-bold block w-fit">
+                    <CheckCircle className="w-3 h-3 text-[#d4af37]" />
+                    تم حفظ البيانات في قاعدة البيانات بنجاح
+                  </span>
                 </div>
                 
                 {/* QR Code Simualtion */}

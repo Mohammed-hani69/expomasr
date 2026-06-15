@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة تحكم المشرف - معمار مصر 2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #030b1a;
+      color: white;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid #1e2d4a;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .header h1 {
+      font-size: 22px;
+      color: #d4af37;
+    }
+    .header .sub {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-gold {
+      background: linear-gradient(135deg, #d4af37, #f5d77b);
+      color: #030b1a;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+    }
+    .btn-danger {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #f87171;
+    }
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #0f1a2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .stat-card .label {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 900;
+      color: #d4af37;
+    }
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters input, .filters select {
+      padding: 10px 14px;
+      background: #0f1a2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 12px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+    }
+    .filters input:focus, .filters select:focus {
+      border-color: #d4af37;
+    }
+    .filters input {
+      min-width: 220px;
+    }
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+      background: #0f1a2e;
+      border: 1px solid #1e2d4a;
+      border-radius: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+    th {
+      background: #09121d;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 14px 16px;
+      text-align: right;
+      border-bottom: 1px solid #1e2d4a;
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #e2e8f0;
+      border-bottom: 1px solid #131f33;
+    }
+    tr:hover td {
+      background: rgba(212,175,55,0.03);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .badge-gold {
+      background: rgba(212,175,55,0.15);
+      border: 1px solid rgba(212,175,55,0.3);
+      color: #d4af37;
+    }
+    .badge-green {
+      background: rgba(52,211,153,0.15);
+      border: 1px solid rgba(52,211,153,0.3);
+      color: #34d399;
+    }
+    .price {
+      font-family: monospace;
+      color: #d4af37;
+      font-weight: bold;
+    }
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
+    }
+    .empty h3 { font-size: 18px; margin-bottom: 8px; }
+    .empty p { font-size: 13px; }
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container { padding: 12px; }
+      .header h1 { font-size: 18px; }
+      .filters input { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>📊 لوحة تحكم الحجوزات</h1>
+        <div class="sub">معرض معمار مصر الرقمي 2026 — إدارة حجوزات الأجنحة</div>
+      </div>
+      <div class="header-actions">
+        <a href="/admin/export" class="btn btn-gold">📥 تصدير CSV</a>
+        <a href="/admin/logout" class="btn btn-danger">🚪 تسجيل الخروج</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">إجمالي الحجوزات</div>
+        <div class="value">{{ stats.total }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">آخر حجز</div>
+        <div class="value" style="font-size:16px;font-weight:600;">
+          {{ stats.last_booking or 'لا يوجد' }}
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="label">إجمالي الباقات المميزة</div>
+        <div class="value">{{ stats.premium_count }}</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="GET" class="filters">
+      <input type="text" name="search" placeholder="🔍 بحث بالاسم أو الشركة أو الهاتف..." value="{{ search or '' }}">
+      <select name="sector">
+        <option value="">كل القطاعات</option>
+        {% for s in sectors %}
+        <option value="{{ s }}" {% if sector == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-gold">بحث</button>
+      {% if search or sector %}
+      <a href="/admin" class="btn btn-outline">إلغاء التصفية</a>
+      {% endif %}
+    </form>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      {% if bookings %}
+      <table>
+        <thead>
+          <tr>
+            <th>كود الحجز</th>
+            <th>اسم الشركة</th>
+            <th>المسؤول</th>
+            <th>الهاتف</th>
+            <th>القطاع</th>
+            <th>الباقة</th>
+            <th>السعر</th>
+            <th>المدينة</th>
+            <th>تاريخ الحجز</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+          <tr>
+            <td><span class="badge badge-gold">{{ b.id }}</span></td>
+            <td><strong>{{ b.companyName }}</strong></td>
+            <td>{{ b.contactPerson }}</td>
+            <td dir="ltr" style="text-align:right;">{{ b.phone }}</td>
+            <td>{{ b.sector }}</td>
+            <td>{{ b.selectedPackage }}</td>
+            <td class="price">{{ "{:,.0f}".format(b.price) }} ج.م</td>
+            <td>{{ b.city or '—' }}</td>
+            <td style="font-size:12px;color:#94a3b8;">{{ b.date }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">
+        <h3>📭 لا توجد حجوزات بعد</h3>
+        <p>عندما يقوم الزوار بحجز أجنحة رقمية، ستظهر البيانات هنا مباشرة.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

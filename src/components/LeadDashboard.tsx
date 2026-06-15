@@ -13,21 +13,9 @@ import {
   Search,
   Check,
   Zap,
-  Settings,
-  Link,
-  AlertCircle,
-  X,
-  Copy,
-  ExternalLink
+  AlertCircle
 } from 'lucide-react';
-import {
-  getGoogleSheetUrl,
-  setGoogleSheetUrl,
-  getSpreadsheetUrl,
-  setSpreadsheetUrl,
-  GOOGLE_APPS_SCRIPT_CODE,
-  sendBookingToGoogleSheets
-} from '../utils/googleSheets';
+import { getBookingsFromFlask } from '../utils/googleSheets';
 
 export default function LeadDashboard() {
   const [leads, setLeads] = useState<MockLead[]>(INITIAL_MOCK_LEADS);
@@ -37,18 +25,28 @@ export default function LeadDashboard() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportComplete, setExportComplete] = useState(false);
 
-  // Google Sheets admin settings modal state
-  const [showSheetsModal, setShowSheetsModal] = useState(false);
-  const [sheetUrl, setSheetUrlState] = useState('');
-  const [scriptUrl, setScriptUrlState] = useState('');
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<null | 'success' | 'testing' | 'error'>(null);
-  const [testResponseMsg, setTestResponseMsg] = useState('');
-
-  // Load saved Google Sheet configurations from localStorage on mount
+  // Fetch real bookings from Flask API on mount
   useEffect(() => {
-    setSheetUrlState(getSpreadsheetUrl());
-    setScriptUrlState(getGoogleSheetUrl());
+    const fetchBookings = async () => {
+      const res = await getBookingsFromFlask();
+      if (res.success && res.data) {
+        const flaskLeads: MockLead[] = res.data.map((b: any) => ({
+          id: b.id,
+          companyName: b.companyName,
+          applicant: b.contactPerson,
+          phone: b.phone,
+          sector: b.sector,
+          budget: `حجز: ${b.selectedPackage}`,
+          date: b.date,
+          status: 'joined' as const,
+        }));
+        if (flaskLeads.length > 0) {
+          setLeads(flaskLeads);
+          setTotalLeadsCount(flaskLeads.length);
+        }
+      }
+    };
+    fetchBookings();
   }, []);
 
   // Listen to new simulated leads submitted from the interactive booth component
@@ -217,14 +215,6 @@ export default function LeadDashboard() {
             <h3 className="text-xl sm:text-2xl font-black text-white">
               لوحة العملاء المحتملين والحملات الاعلانية المباشرة
             </h3>
-            <button 
-              onClick={() => setShowSheetsModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-gold/15 border border-brand-gold/30 hover:bg-brand-gold/25 text-brand-gold text-[10px] font-bold rounded-lg transition-all cursor-pointer shadow-lg shadow-brand-gold/5 uppercase"
-              title="إعداد ربط غوغل شيت لاستقبال حجوزاتك الفعلية"
-            >
-              <Settings className="w-3 px-0 py-0.5 animate-spin-slow" />
-              <span>ربط غوغل شيت ⚙️</span>
-            </button>
           </div>
           <p className="text-slate-400 text-xs sm:text-sm mt-1 max-w-2xl">
             توضح هذه البدالة التفاعلية كيف ستتلقى بيانات واهتمامات العملاء وطلبات الاتصال دقيقة بدقيقة.
@@ -406,148 +396,7 @@ export default function LeadDashboard() {
         </p>
       </div>
 
-      {/* Google Sheets Custom Setup Modal */}
-      {showSheetsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
-          <div className="bg-brand-blue-medium border border-brand-blue-light/80 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar text-right leading-relaxed" style={{ direction: 'rtl' }}>
-            
-            {/* Close button */}
-            <button 
-              onClick={() => setShowSheetsModal(false)}
-              className="absolute top-4 left-4 p-2 bg-[#0b1422] rounded-full border border-white/10 hover:border-[#d4af37]/50 text-slate-400 hover:text-white transition-all cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
 
-            {/* Modal Header */}
-            <div className="mb-6">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#d4af37]/10 border border-[#d4af37]/20 rounded-full text-[#d4af37] text-xs font-semibold mb-2">
-                <Link className="w-3.5 h-3.5 text-[#d4af37]" />
-                <span>الربط بقاعدة بيانات Google Sheets السحابية</span>
-              </div>
-              <h4 className="text-xl sm:text-2xl font-black text-white">
-                إعداد واستقبال الحجوزات الحية
-              </h4>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                اربط نموذج حجز المساحة المعمارية الرقمية بجدول بيانات Google الـخاص بك مباشرة لتلقي كافة تفاصيل الشركات العارضة لحظياً وبأمان في متصفحك.
-              </p>
-            </div>
-
-            {/* Settings Fields */}
-            <div className="space-y-4 mb-6">
-              {/* Spreadsheet URL Input */}
-              <div className="space-y-1.5">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300">
-                  1. رابط ملف Google Sheets المستهدف (للمرجعية الفنية):
-                </label>
-                <input 
-                  type="text"
-                  value={sheetUrl}
-                  onChange={(e) => setSheetUrlState(e.target.value)}
-                  placeholder="https://docs.google.com/spreadsheets/d/.../edit"
-                  className="w-full text-xs p-3 bg-brand-blue-dark border border-brand-blue-light/60 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-[#d4af37]"
-                />
-              </div>
-
-              {/* Script Web App URL Input */}
-              <div className="space-y-1.5">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300">
-                  2. رابط تنفيذ الويب Google Apps Script الخاص بك (ينتهي بـ /exec):
-                </label>
-                <input 
-                  type="text"
-                  value={scriptUrl}
-                  onChange={(e) => setScriptUrlState(e.target.value)}
-                  placeholder="https://script.google.com/macros/s/.../exec"
-                  className="w-full text-xs p-3 bg-brand-blue-dark border border-brand-blue-light/60 rounded-xl text-white placeholder-slate-650 focus:outline-none focus:border-[#d4af37]"
-                />
-              </div>
-
-              {/* Status and feedback line */}
-              {saveStatus && (
-                <div className={`p-4 rounded-xl text-xs flex gap-2 sm:gap-3 ${
-                  saveStatus === 'success' 
-                    ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400' 
-                    : saveStatus === 'error'
-                    ? 'bg-red-500/10 border border-red-500/30 text-red-400'
-                    : 'bg-brand-gold/10 border border-brand-gold/30 text-brand-gold'
-                }`}>
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <p className="leading-relaxed">{testResponseMsg}</p>
-                </div>
-              )}
-
-              {/* Action buttons inside the modal */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={handleSaveSheetsConfig}
-                  className="px-5 py-2.5 bg-[#d4af37] hover:bg-[#ffe17d] text-[#030b1a] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md shadow-brand-gold/10"
-                >
-                  حفظ البيانات والروابط
-                </button>
-                <button
-                  type="button"
-                  onClick={handleTestConnection}
-                  disabled={saveStatus === 'testing'}
-                  className="px-5 py-2.5 bg-[#0b1422] hover:bg-[#121f35] border border-brand-blue-light rounded-xl text-slate-200 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  {saveStatus === 'testing' ? 'جاري الفحص...' : 'إرسال ونبض تجربة الفحص ⚡'}
-                </button>
-              </div>
-            </div>
-
-            {/* Setup Instructions Segment - Collapsible */}
-            <div className="bg-[#0b1422] border border-brand-blue-light/50 rounded-2xl p-4 text-right">
-              <h5 className="text-xs sm:text-sm font-bold text-white mb-2 flex items-center gap-2 text-brand-gold">
-                <Sparkles className="w-4 h-4 text-brand-gold animate-pulse" />
-                <span>كيفية إعداد وربط جدول غوغل شيت (في 30 ثانية فقط)</span>
-              </h5>
-              <div className="text-[11px] sm:text-xs text-slate-400 space-y-2 leading-relaxed">
-                <p>
-                  1. افتح جدول بيانات Google Sheets الخاص بك.
-                </p>
-                <p>
-                  2. من القائمة العلوية، اضغط على <strong>Extensions (الاضافات)</strong> ثم اختر <strong>Apps Script</strong>.
-                </p>
-                <p>
-                  3. قم بمسح أي كود موجود بالداخل، ثم اضغط على الزر بالأسفل لنسخ الكود البرمجي المطور والصقه هناك بالكامل:
-                </p>
-                
-                <button
-                  type="button"
-                  onClick={handleCopyScriptCode}
-                  className="inline-flex items-center gap-1.5 my-1.5 px-3 py-1.5 bg-brand-gold/15 border border-brand-gold/30 hover:bg-brand-gold/25 text-brand-gold rounded-lg transition-all cursor-pointer font-semibold text-[11px]"
-                >
-                  {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copiedCode ? 'تم النسخ بنجاح!' : 'نسخ الكود البرمجي الذكي لـ Apps Script'}</span>
-                </button>
-
-                <p>
-                  4. اضغط على زر <strong>Deploy (نشر)</strong> في الزاوية العلوية ثم اختر <strong>New deployment (نشر جديد)</strong>.
-                </p>
-                <p>
-                  5. قم بضبط الخيارات كالتالي:
-                  <ul className="list-disc list-inside mr-4 mt-1 space-y-0.5 font-bold text-slate-300">
-                    <li>نوع النشر (Type): <span className="text-white">Web app</span></li>
-                    <li>المستخدم المنفذ (Execute as): <span className="text-white">Me (بريدك الخاص)</span></li>
-                    <li>من يدخل (Who has access): <span className="text-[#d4af37]">Anyone (أي شخص)</span> - <span className="font-normal text-slate-400 text-[10px]">خطوة إجبارية لاستقبال البيانات</span></li>
-                  </ul>
-                </p>
-                <p className="mt-1">
-                  6. انقر على **Deploy**، ثم امنح أذونات الوصول لحسابك، ومباشرة انسخ رابط الـ <strong>Web app URL</strong> الطويل (الذي ينتهي بـ `/exec`) والصقه في الخانة رقم 2 بالأعلى لحفظ التفعيل الفوري والكامل!
-                </p>
-              </div>
-            </div>
-
-            {/* Notice Footer inside modal */}
-            <div className="mt-4 pt-4 border-t border-white/5 text-center">
-              <span className="text-[10px] text-slate-500 block">معاد حمايتها ومؤمنة بالكامل للاتصالات اللاسلكية المشفرة - معرض معمار مصر 2026</span>
-            </div>
-
-          </div>
-        </div>
-      )}
 
     </div>
   );
