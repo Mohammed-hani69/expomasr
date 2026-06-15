@@ -22,8 +22,8 @@ CORS(app)
 DB_PATH = os.path.join(os.path.dirname(__file__), 'bookings.db')
 
 # Admin credentials (change in production via env vars)
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'ezezo291')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'ezezo291')
 
 
 def get_db():
