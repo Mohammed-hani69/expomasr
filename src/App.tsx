@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as Icons from 'lucide-react';
-import { SECTORS } from './data';
+import { SECTORS, DIGITAL_BOOTHS } from './data';
 // @ts-ignore
 import heroBg from './assets/images/cairo_expo_bg_1781526370175.jpg';
 // @ts-ignore
@@ -19,10 +19,12 @@ import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 
 // Review rating icons helper
-import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle } from 'lucide-react';
+import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle, ArrowRight, Sparkles, LayoutGrid } from 'lucide-react';
 
 export default function App() {
   const [selectedPkgId, setSelectedPkgId] = useState<string>('professional');
+  const [currentView, setCurrentView] = useState<'home' | 'booth'>('home');
+  const [selectedBoothId, setSelectedBoothId] = useState<'contracting' | 'realestate' | 'decor'>('contracting');
 
   const handleSelectPackage = (packageId: string) => {
     setSelectedPkgId(packageId);
@@ -135,10 +137,75 @@ export default function App() {
       <div className="absolute bottom-[800px] right-10 w-[450px] h-[450px] bg-[#d4af37]/5 rounded-full blur-[150px] pointer-events-none"></div>
 
       {/* STICKY HEADER */}
-      <Header />
+      <Header 
+        currentView={currentView} 
+        onBack={() => {
+          setCurrentView('home');
+          setTimeout(() => {
+            const el = document.getElementById('booth-showcase');
+            if (el) {
+              const offset = 85;
+              const bodyRect = document.body.getBoundingClientRect().top;
+              const elementRect = el.getBoundingClientRect().top;
+              const elementPosition = elementRect - bodyRect;
+              const offsetPosition = elementPosition - offset;
+              window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+          }, 100);
+        }} 
+        companyName={currentView === 'booth' ? DIGITAL_BOOTHS[selectedBoothId]?.companyName : undefined} 
+      />
 
-      {/* HERO SECTION */}
-      <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-brand-blue-dark">
+      {currentView === 'booth' ? (
+        /* ISOLATED COMPONENT VIEWER / PRIVATE BOOTH PAGE */
+        <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-[85vh]">
+          {/* Back trace option */}
+          <div className="mb-6">
+            <button
+              onClick={() => {
+                setCurrentView('home');
+                setTimeout(() => {
+                  const el = document.getElementById('booth-showcase');
+                  if (el) {
+                    const offset = 85;
+                    const bodyRect = document.body.getBoundingClientRect().top;
+                    const elementRect = el.getBoundingClientRect().top;
+                    const elementPosition = elementRect - bodyRect;
+                    const offsetPosition = elementPosition - offset;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
+              className="text-[#d4af37] text-xs sm:text-sm font-bold flex items-center gap-1.5 hover:underline cursor-pointer bg-transparent border-none outline-none"
+            >
+              <ArrowRight className="w-4 h-4" />
+              <span>العودة لساحة المعرض والأجنحة الرئيسية</span>
+            </button>
+          </div>
+
+          <InteractiveBooth 
+            initialSector={selectedBoothId} 
+            isStandalonePage={true} 
+            onBackToMain={() => {
+              setCurrentView('home');
+              setTimeout(() => {
+                const el = document.getElementById('booth-showcase');
+                if (el) {
+                  const offset = 85;
+                  const bodyRect = document.body.getBoundingClientRect().top;
+                  const elementRect = el.getBoundingClientRect().top;
+                  const elementPosition = elementRect - bodyRect;
+                  const offsetPosition = elementPosition - offset;
+                  window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                }
+              }, 100);
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          {/* HERO SECTION */}
+          <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-brand-blue-dark">
         {/* Background Video loop with robust background-image fallback for any server/connection conditions */}
         <div 
           className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-40 mix-blend-lighten"
@@ -393,9 +460,190 @@ export default function App() {
         </div>
       </section>
 
-      {/* COMPACT INTERACTIVE VIRTUAL BOOTH SHOWCASE */}
-      <section id="booth-showcase" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <InteractiveBooth />
+      {/* 3 COMPANIES VIRTUAL SHOWCASE - COVER IMAGES */}
+      <section id="booth-showcase" className="py-20 bg-[#020813] border-y border-white/5 relative overflow-hidden">
+        {/* subtle styling dots */}
+        <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#d4af37]/5 rounded-full blur-[120px] pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-xs sm:text-sm font-bold text-[#d4af37] tracking-widest bg-[#d4af37]/10 px-3 py-1 rounded-full border border-[#d4af37]/20 font-mono">
+              الأجنحة الرقـمية لعمالقة التشـييد والعقارات
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
+              استكشف الأجنحة الافتراضية المستقلة
+            </h2>
+            <p className="text-white/70 text-xs sm:text-sm mt-3 leading-relaxed">
+              اختر إحدى المؤسسات العقارية والمعمارية الرائدة للدخول مباشرة إلى جناحها المميز بشكل منفصل وتجربة واجهة العرض التفاعلية الكاملة.
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Card 1: Contracting */}
+            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#d4af37]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
+              {/* Cover Image */}
+              <div className="h-48 relative overflow-hidden shrink-0">
+                <img 
+                  src={DIGITAL_BOOTHS.contracting.bannerUrl} 
+                  alt={DIGITAL_BOOTHS.contracting.companyName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.6]"
+                />
+                <span className="absolute top-4 right-4 bg-yellow-500/90 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  المقاولات والخرسانات
+                </span>
+                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
+                  جناح VIP 12
+                </span>
+              </div>
+              {/* Content body */}
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
+                  {DIGITAL_BOOTHS.contracting.companyName}
+                </h3>
+                <p className="text-brand-gold text-xs font-bold mt-1.5">
+                  {DIGITAL_BOOTHS.contracting.tagline}
+                </p>
+                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
+                  {DIGITAL_BOOTHS.contracting.about}
+                </p>
+                {/* Visual mini status indicators */}
+                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>فيديو تعريفي 4K</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>أسئلة فنية تفاعلية</span>
+                  </div>
+                </div>
+                {/* Click action */}
+                <button
+                  onClick={() => {
+                    setSelectedBoothId('contracting');
+                    setCurrentView('booth');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                  }}
+                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>دخول الجناح الافتراضي</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Card 2: Real Estate */}
+            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#d4af37]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
+              {/* Cover Image */}
+              <div className="h-48 relative overflow-hidden shrink-0">
+                <img 
+                  src={DIGITAL_BOOTHS.realestate.bannerUrl} 
+                  alt={DIGITAL_BOOTHS.realestate.companyName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.6]"
+                />
+                <span className="absolute top-4 right-4 bg-emerald-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  التطوير والاستثمار العقاري
+                </span>
+                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
+                  جناح VIP 07
+                </span>
+              </div>
+              {/* Content body */}
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
+                  {DIGITAL_BOOTHS.realestate.companyName}
+                </h3>
+                <p className="text-brand-gold text-xs font-bold mt-1.5">
+                  {DIGITAL_BOOTHS.realestate.tagline}
+                </p>
+                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
+                  {DIGITAL_BOOTHS.realestate.about}
+                </p>
+                {/* Visual mini status indicators */}
+                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>نظم سداد مرنة</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>حساب أرباح استثمارية</span>
+                  </div>
+                </div>
+                {/* Click action */}
+                <button
+                  onClick={() => {
+                    setSelectedBoothId('realestate');
+                    setCurrentView('booth');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                  }}
+                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>دخول الجناح الافتراضي</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Card 3: Interior Decor */}
+            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#d4af37]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
+              {/* Cover Image */}
+              <div className="h-48 relative overflow-hidden shrink-0">
+                <img 
+                  src={DIGITAL_BOOTHS.decor.bannerUrl} 
+                  alt={DIGITAL_BOOTHS.decor.companyName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.6]"
+                />
+                <span className="absolute top-4 right-4 bg-purple-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
+                  الديكور واللاندسكيب
+                </span>
+                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
+                  جناح VIP 23
+                </span>
+              </div>
+              {/* Content body */}
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
+                  {DIGITAL_BOOTHS.decor.companyName}
+                </h3>
+                <p className="text-brand-gold text-xs font-bold mt-1.5">
+                  {DIGITAL_BOOTHS.decor.tagline}
+                </p>
+                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
+                  {DIGITAL_BOOTHS.decor.about}
+                </p>
+                {/* Visual mini status indicators */}
+                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>تشطيبات نيو كلاسيك</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
+                    <span>معرض صور 4K</span>
+                  </div>
+                </div>
+                {/* Click action */}
+                <button
+                  onClick={() => {
+                    setSelectedBoothId('decor');
+                    setCurrentView('booth');
+                    window.scrollTo({ top: 0, behavior: 'instant' });
+                  }}
+                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <span>دخول الجناح الافتراضي</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
       </section>
 
       {/* REAL-TIME LEAD CONTROL PORTAL INTERACTIVE PANEL */}
@@ -490,6 +738,9 @@ export default function App() {
         <RegistrationSection preSelectedPackageId={selectedPkgId} />
 
       </section>
+
+        </>
+      )}
 
       {/* FOOTER */}
       <Footer />

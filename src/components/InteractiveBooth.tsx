@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DIGITAL_BOOTHS } from '../data';
 import { DigitalBooth, Project } from '../types';
 import { 
@@ -17,12 +17,47 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  Sparkles
 } from 'lucide-react';
 
-export default function InteractiveBooth() {
-  const [activeSector, setActiveSector] = useState<'contracting' | 'realestate' | 'decor'>('contracting');
+interface InteractiveBoothProps {
+  initialSector?: 'contracting' | 'realestate' | 'decor';
+  onBackToMain?: () => void;
+  isStandalonePage?: boolean;
+}
+
+export default function InteractiveBooth({
+  initialSector = 'contracting',
+  onBackToMain,
+  isStandalonePage = false
+}: InteractiveBoothProps) {
+  const [activeSector, setActiveSector] = useState<'contracting' | 'realestate' | 'decor'>(initialSector);
   const [activeTab, setActiveTab] = useState<'about' | 'gallery' | 'projects'>('about');
+
+  // 3D Isometric Viewport States
+  const [rotationY, setRotationY] = useState(-18);
+  const [rotationX, setRotationX] = useState(14);
+  const [zoom, setZoom] = useState(0.95);
+  const [isAutoRotating, setIsAutoRotating] = useState(true);
+  const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
+
+  // Dynamic automatic 3D Orbit timer
+  useEffect(() => {
+    if (!isAutoRotating) return;
+    const interval = setInterval(() => {
+      setRotationY((prev) => {
+        const next = prev + 0.16;
+        return next >= 360 ? next - 360 : next;
+      });
+    }, 28);
+    return () => clearInterval(interval);
+  }, [isAutoRotating]);
+
+  useEffect(() => {
+    setActiveSector(initialSector);
+    setActiveTab('about');
+  }, [initialSector]);
   
   // Lightbox state
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -97,56 +132,80 @@ export default function InteractiveBooth() {
       )}
 
       {/* Section Header */}
-      <div className="text-center mb-8">
-        <span className="text-xs sm:text-sm font-bold text-brand-gold tracking-widest bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">
-          استعراض تفاعلي حي للجناح الافتراضي
-        </span>
-        <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">
-          كيف ستبدو شركتك داخل المعرض الرقمي؟
-        </h3>
-        <p className="text-slate-300 text-sm sm:text-base mt-2 max-w-2xl mx-auto">
-          اختر قطاعاً لمشاهدة مثال حي لجناح مجهز بالكامل. تفاعل مع الأزرار والمعارض لتجربة واجهة عميلك الخاصة.
-        </p>
-      </div>
+      {!isStandalonePage ? (
+        <>
+          <div className="text-center mb-8">
+            <span className="text-xs sm:text-sm font-bold text-brand-gold tracking-widest bg-brand-gold/10 px-3 py-1 rounded-full border border-brand-gold/20">
+              استعراض تفاعلي حي للجناح الافتراضي
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-white mt-3">
+              كيف ستبدو شركتك داخل المعرض الرقمي؟
+            </h3>
+            <p className="text-slate-300 text-sm sm:text-base mt-2 max-w-2xl mx-auto">
+              اختر قطاعاً لمشاهدة مثال حي لجناح مجهز بالكامل. تفاعل مع الأزرار والمعارض لتجربة واجهة عميلك الخاصة.
+            </p>
+          </div>
 
-      {/* Sector Switchers */}
-      <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
-        <button
-          onClick={() => { setActiveSector('contracting'); setActiveTab('about'); }}
-          className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
-            activeSector === 'contracting'
-              ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
-              : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
-          }`}
-        >
-          <Briefcase className="w-4 h-4" />
-          <span>جناح شركة مقاولات</span>
-        </button>
+          {/* Sector Switchers */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-8">
+            <button
+              onClick={() => { setActiveSector('contracting'); setActiveTab('about'); }}
+              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                activeSector === 'contracting'
+                  ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
+                  : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
+              }`}
+            >
+              <Briefcase className="w-4 h-4" />
+              <span>جناح شركة مقاولات</span>
+            </button>
 
-        <button
-          onClick={() => { setActiveSector('realestate'); setActiveTab('about'); }}
-          className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
-            activeSector === 'realestate'
-              ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
-              : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
-          }`}
-        >
-          <Building2 className="w-4 h-4" />
-          <span>جناح شركة تطوير عقاري</span>
-        </button>
+            <button
+              onClick={() => { setActiveSector('realestate'); setActiveTab('about'); }}
+              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                activeSector === 'realestate'
+                  ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
+                  : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>جناح شركة تطوير عقاري</span>
+            </button>
 
-        <button
-          onClick={() => { setActiveSector('decor'); setActiveTab('about'); }}
-          className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
-            activeSector === 'decor'
-              ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
-              : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
-          }`}
-        >
-          <Award className="w-4 h-4" />
-          <span>جناح شركة ديكور وتصميم</span>
-        </button>
-      </div>
+            <button
+              onClick={() => { setActiveSector('decor'); setActiveTab('about'); }}
+              className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                activeSector === 'decor'
+                  ? 'bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold text-brand-blue-dark shadow-lg shadow-brand-gold/25'
+                  : 'bg-brand-blue-light/50 text-slate-300 hover:text-white hover:bg-brand-blue-light'
+              }`}
+            >
+              <Award className="w-4 h-4" />
+              <span>جناح شركة ديكور وتصميم</span>
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1422] border border-[#d4af37]/25">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#d4af37]/10 rounded-xl border border-[#d4af37]/30 text-[#d4af37]">
+              <Sparkles className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <span className="text-[10px] text-[#d4af37] font-bold block uppercase tracking-wider">مجسم الأجنحة الافتراضية المستقلة</span>
+              <h4 className="text-white text-xs sm:text-sm font-extrabold leading-tight">
+                أنت الآن تتصفح الجناح الرقمي المخصص لـ <span className="text-brand-gold">{currentBooth.companyName}</span>
+              </h4>
+            </div>
+          </div>
+          <button
+            onClick={onBackToMain}
+            className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-[#d4af37] hover:text-[#030b1a] rounded-xl text-xs font-semibold text-slate-300 transition-all cursor-pointer"
+          >
+            ← العودة لجميع العارضين
+          </button>
+        </div>
+      )}
 
       {/* Main Booth View Frame */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-brand-blue-dark/50 border border-brand-blue-light/40 rounded-2xl p-4 sm:p-6 overflow-hidden">

@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Calendar, ShieldCheck } from 'lucide-react';
+import { Menu, X, Calendar, ShieldCheck, ArrowRight, Home } from 'lucide-react';
 
-export default function Header() {
+interface HeaderProps {
+  currentView?: 'home' | 'booth';
+  onBack?: () => void;
+  companyName?: string;
+}
+
+export default function Header({ currentView = 'home', onBack, companyName }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -81,56 +87,76 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-1 space-x-reverse">
-            {menuItems.map((item) => (
-              <a
-                id={`nav-${item.href.replace('#', '')}`}
-                key={item.href}
-                href={item.href}
-                onClick={(e) => scrollToSection(e, item.href)}
-                className="px-3 py-1.5 text-xs font-semibold text-white/70 hover:text-[#d4af37] transition-colors duration-200 hover:bg-white/5 rounded-full border border-transparent hover:border-white/5"
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
+          {currentView === 'booth' ? (
+            <div className="hidden lg:flex items-center gap-3">
+              <span className="text-xs font-bold text-slate-400 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full">
+                نظام استعراض الأجنحة المستقل — <span className="text-brand-gold">{companyName}</span>
+              </span>
+            </div>
+          ) : (
+            <nav className="hidden lg:flex items-center space-x-1 space-x-reverse">
+              {menuItems.map((item) => (
+                <a
+                  id={`nav-${item.href.replace('#', '')}`}
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => scrollToSection(e, item.href)}
+                  className="px-3 py-1.5 text-xs font-semibold text-white/70 hover:text-[#d4af37] transition-colors duration-200 hover:bg-white/5 rounded-full border border-transparent hover:border-white/5"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          )}
 
           {/* CTA Box & Mobile Toggle */}
           <div className="flex items-center gap-1.5 xs:gap-4">
-            {/* Bento date badge on desktop */}
-            <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#d4af37]/20">
-              <span className="text-[9px] text-white/60 uppercase">الموعد القادم للضخ</span>
-              <span className="text-xs font-bold text-[#d4af37]">سبتمبر 2026</span>
-            </div>
+            {currentView === 'booth' ? (
+              <button
+                onClick={onBack}
+                className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-l from-brand-gold to-brand-gold-bright text-[#030b1a] rounded-full font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-gold/15 transition-all duration-300 cursor-pointer"
+              >
+                <ArrowRight className="w-4 h-4 shrink-0" />
+                <span>العودة لساحة المعرض الرئيسية</span>
+              </button>
+            ) : (
+              <>
+                {/* Bento date badge on desktop */}
+                <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#d4af37]/20">
+                  <span className="text-[9px] text-white/60 uppercase">الموعد القادم للضخ</span>
+                  <span className="text-xs font-bold text-[#d4af37]">سبتمبر 2026</span>
+                </div>
 
-            <a
-              id="header-cta-button"
-              href="#register-section"
-              onClick={(e) => scrollToSection(e, '#register-section')}
-              className="hidden md:inline-flex items-center bg-white text-[#030b1a] px-6 py-2.5 rounded-full font-bold text-xs hover:bg-[#d4af37] transition-all duration-300 shadow-md shadow-white/5 cursor-pointer"
-            >
-              <span>احجز جناحك الآن</span>
-            </a>
+                <a
+                  id="header-cta-button"
+                  href="#register-section"
+                  onClick={(e) => scrollToSection(e, '#register-section')}
+                  className="hidden md:inline-flex items-center bg-white text-[#030b1a] px-6 py-2.5 rounded-full font-bold text-xs hover:bg-[#d4af37] transition-all duration-300 shadow-md shadow-white/5 cursor-pointer"
+                >
+                  <span>احجز جناحك الآن</span>
+                </a>
 
-            {/* Mobile menu button */}
-            <button
-              id="mobile-menu-toggle"
-              type="button"
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex lg:hidden items-center justify-center p-2 rounded-xl text-slate-400 hover:text-white hover:bg-brand-blue-light/70 focus:outline-none transition-all duration-200 border border-slate-700/50"
-              aria-controls="mobile-menu"
-              aria-expanded="false"
-            >
-              <span className="sr-only">فتح القائمة</span>
-              {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
-            </button>
+                {/* Mobile menu button */}
+                <button
+                  id="mobile-menu-toggle"
+                  type="button"
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="inline-flex lg:hidden items-center justify-center p-2 rounded-xl text-slate-400 hover:text-white hover:bg-brand-blue-light/70 focus:outline-none transition-all duration-200 border border-slate-700/50"
+                  aria-controls="mobile-menu"
+                  aria-expanded="false"
+                >
+                  <span className="sr-only">فتح القائمة</span>
+                  {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+                </button>
+              </>
+            )}
           </div>
 
         </div>
       </div>
 
       {/* Mobile Menu, show/hide based on menu state */}
-      {isOpen && (
+      {isOpen && currentView !== 'booth' && (
         <div className="lg:hidden bg-brand-blue-dark/98 border-b border-brand-blue-light/80" id="mobile-menu">
           <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
             {menuItems.map((item) => (

@@ -29,6 +29,13 @@
   background: #D4AF37;
 }
 
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-brand-blue-dark);
