@@ -23,7 +23,8 @@ except ImportError:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'expo-masr-2026-secret-key-change-in-production')
-CORS(app)
+# Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
 DB_PATH = os.path.join(os.path.dirname(__file__), 'bookings.db')
 
@@ -230,7 +231,6 @@ def admin_export():
 
 
 @app.route('/api/generate-ticket-pdf', methods=['POST'])
-@login_required
 def generate_ticket_pdf():
     """توليد PDF للتذكرة من الـ backend"""
     try:

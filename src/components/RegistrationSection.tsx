@@ -225,7 +225,8 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
     try {
       // Call backend API to generate PDF
-      const response = await fetch('http://localhost:5001/api/generate-ticket-pdf', {
+      const backendUrl = process.env.VITE_API_URL || 'http://localhost:5001';
+      const response = await fetch(`${backendUrl}/api/generate-ticket-pdf`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
