@@ -19,7 +19,7 @@ import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 
 // Review rating icons helper
-import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle, ArrowRight, Sparkles, LayoutGrid } from 'lucide-react';
+import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle, ArrowRight, Sparkles, LayoutGrid, Share2 } from 'lucide-react';
 
 export default function App() {
   const [selectedPkgId, setSelectedPkgId] = useState<string>('professional');
@@ -522,6 +522,59 @@ export default function App() {
                     <span>أسئلة فنية تفاعلية</span>
                   </div>
                 </div>
+
+                {/* Social Sharing Section */}
+                <div className="flex items-center justify-between border-t border-[#d4af37]/10 pt-3.5 pb-2 mb-4">
+                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
+                    <span>مشاركة الجناح:</span>
+                  </span>
+                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
+                    {/* WhatsApp */}
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                        `استكشف جناح ${DIGITAL_BOOTHS.contracting.companyName} المميز في معرض إكسبو مصر للبناء والعقارات 2026 - تجربة تفاعلية ثلاثية الأبعاد!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر واتساب"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
+                      </svg>
+                    </a>
+                    {/* Facebook */}
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر فيسبوك"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
+                      </svg>
+                    </a>
+                    {/* LinkedIn */}
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر لينكد إن"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
                 {/* Click action */}
                 <button
                   onClick={() => {
@@ -575,6 +628,59 @@ export default function App() {
                     <span>حساب أرباح استثمارية</span>
                   </div>
                 </div>
+
+                {/* Social Sharing Section */}
+                <div className="flex items-center justify-between border-t border-[#d4af37]/10 pt-3.5 pb-2 mb-4">
+                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
+                    <span>مشاركة الجناح:</span>
+                  </span>
+                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
+                    {/* WhatsApp */}
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                        `استكشف جناح ${DIGITAL_BOOTHS.realestate.companyName} المميز في معرض إكسبو مصر للبناء والعقارات 2026 - تجربة تفاعلية ثلاثية الأبعاد!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر واتساب"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
+                      </svg>
+                    </a>
+                    {/* Facebook */}
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر فيسبوك"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
+                      </svg>
+                    </a>
+                    {/* LinkedIn */}
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر لينكد إن"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
                 {/* Click action */}
                 <button
                   onClick={() => {
@@ -628,6 +734,59 @@ export default function App() {
                     <span>معرض صور 4K</span>
                   </div>
                 </div>
+
+                {/* Social Sharing Section */}
+                <div className="flex items-center justify-between border-t border-[#d4af37]/10 pt-3.5 pb-2 mb-4">
+                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
+                    <span>مشاركة الجناح:</span>
+                  </span>
+                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
+                    {/* WhatsApp */}
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                        `استكشف جناح ${DIGITAL_BOOTHS.decor.companyName} المميز في معرض إكسبو مصر للبناء والعقارات 2026 - تجربة تفاعلية ثلاثية الأبعاد!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر واتساب"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
+                      </svg>
+                    </a>
+                    {/* Facebook */}
+                    <a
+                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر فيسبوك"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
+                      </svg>
+                    </a>
+                    {/* LinkedIn */}
+                    <a
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                        'https://expomasr.online/'
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
+                      title="مشاركة عبر لينكد إن"
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+
                 {/* Click action */}
                 <button
                   onClick={() => {

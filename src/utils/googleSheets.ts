@@ -22,16 +22,8 @@ export function setSpreadsheetUrl(url: string): void {
 }
 
 export function getGoogleSheetUrl(): string {
-  // Use standard static import.meta.env so Vite can replace this at build time
-  // @ts-ignore
-  const envUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
-  if (envUrl && envUrl.trim() !== '' && !envUrl.includes('...')) {
-    return envUrl.trim();
-  }
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem(STORAGE_KEY) || '';
-  }
-  return '';
+  // Statically hardcoded URL per user request for seamless zero-setup deployments (no .env required)
+  return "https://script.google.com/macros/s/AKfycby3AaEZ8begE5t19TIZgzWIe77ubs3c0OQM7nC24CN2nUVVlE_45rBxQEpXoBFEXXxu/exec";
 }
 
 export function setGoogleSheetUrl(url: string): void {
