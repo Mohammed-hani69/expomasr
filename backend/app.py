@@ -371,7 +371,9 @@ def generate_ticket_pdf():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-
+@app.route('/admin/export-excel')
+@login_required
+def admin_export_excel():
     """تصدير البيانات بصيغة Excel احترافية مع تنسيق مميز"""
     if not HAS_OPENPYXL:
         return jsonify({'success': False, 'error': 'مكتبة Excel غير مثبتة'}), 500
