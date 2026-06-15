@@ -70,12 +70,6 @@ def teardown(exception=None):
 
 # ─── API Routes ────────────────────────────────────────────────
 
-@app.route('/')
-def home():
-    """الصفحة الرئيسية - إعادة توجيه إلى لوحة التحكم"""
-    return redirect(url_for('admin_login'))
-
-
 @app.route('/api/bookings', methods=['POST'])
 def create_booking():
     data = request.get_json()
