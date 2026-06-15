@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as Icons from 'lucide-react';
 import { SECTORS } from './data';
+// @ts-ignore
+import heroBg from './assets/images/cairo_expo_bg_1781526370175.jpg';
 
 // Import our custom responsive components
 import Header from './components/Header';
@@ -132,12 +134,15 @@ export default function App() {
       <Header />
 
       {/* HERO SECTION */}
-      <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background Video loop showing clearly and cleanly with an exquisite luxury architectural vibe */}
-        <div className="absolute inset-0 z-0 select-none pointer-events-none">
+      <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-brand-blue-dark">
+        {/* Background Video loop with robust background-image fallback for any server/connection conditions */}
+        <div 
+          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-40 mix-blend-lighten"
+          style={{ backgroundImage: `url(${heroBg})` }}
+        >
           <video
             src="https://assets.mixkit.co/videos/preview/mixkit-modern-building-with-curved-lines-and-glass-facades-44158-large.mp4"
-            poster="/src/assets/images/cairo_expo_bg_1781526370175.jpg"
+            poster={heroBg}
             className="w-full h-full object-cover"
             autoPlay
             loop

@@ -182,43 +182,43 @@ export default function InteractiveBooth() {
           </div>
 
           {/* Booth Sub Navigation Tabs */}
-          <div className="flex border-b border-brand-blue-light/80">
+          <div className="flex overflow-x-auto scrollbar-none border-b border-brand-blue-light/80 -mx-2 px-2 sm:mx-0 sm:px-0 whitespace-nowrap gap-1">
             <button
               onClick={() => setActiveTab('about')}
-              className={`pb-3 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+              className={`pb-3 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex-shrink-0 ${
                 activeTab === 'about'
                   ? 'border-brand-gold text-brand-gold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span className="flex items-center gap-2">
-                <Info className="w-4 h-4" />
+              <span className="flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5" />
                 عن الشركة والتعريف
               </span>
             </button>
             <button
               onClick={() => setActiveTab('gallery')}
-              className={`pb-3 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+              className={`pb-3 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex-shrink-0 ${
                 activeTab === 'gallery'
                   ? 'border-brand-gold text-brand-gold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span className="flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" />
-                معرض المنتجات والصور ({currentBooth.gallery.length})
+              <span className="flex items-center gap-1.5">
+                <ImageIcon className="w-3.5 h-3.5" />
+                معرض الصور ({currentBooth.gallery.length})
               </span>
             </button>
             <button
               onClick={() => setActiveTab('projects')}
-              className={`pb-3 px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+              className={`pb-3 px-3 sm:px-4 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer flex-shrink-0 ${
                 activeTab === 'projects'
                   ? 'border-brand-gold text-brand-gold'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <span className="flex items-center gap-2">
-                <Briefcase className="w-4 h-4" />
+              <span className="flex items-center gap-1.5">
+                <Briefcase className="w-3.5 h-3.5" />
                 أبرز المشاريع ({currentBooth.projects.length})
               </span>
             </button>
