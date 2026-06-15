@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { SECTORS, PACKAGES } from '../data';
 import { RegistrationForm } from '../types';
 import { sendBookingToFlask } from '../utils/googleSheets';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 // @ts-ignore
 import formBg from '../assets/images/booking_form_bg_1781534095031.jpg';
 import { 
@@ -214,11 +212,11 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
   };
 
   const handleDownloadTicket = async () => {
-    if (!ticketRef.current) {
+    if (!savedTicket) {
       setModalState({
         type: 'error',
         title: '❌ خطأ',
-        message: 'تعذر العثور على عنصر تذكرة الحجز. يرجى التحديث والمحاولة مجددًا.'
+        message: 'لا توجد بيانات لتحميل الرخصة. يرجى إنشاء حجز أولاً.'
       });
       return;
     }
@@ -226,68 +224,42 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     setIsDownloadingPdf(true);
 
     try {
-      const ticketElement = ticketRef.current;
-      
-      // Create a clean clone to avoid oklab color issues
-      const clonedElement = ticketElement.cloneNode(true) as HTMLElement;
-      const tempContainer = document.createElement('div');
-      tempContainer.style.position = 'fixed';
-      tempContainer.style.left = '-9999px';
-      tempContainer.style.top = '-9999px';
-      tempContainer.appendChild(clonedElement);
-      document.body.appendChild(tempContainer);
-
-      // Capture the element using html2canvas
-      const canvas = await html2canvas(clonedElement, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#030b1a",
-        logging: false,
-        allowTaint: true,
-        foreignObjectContent: false,
-      });
-      
-      // Clean up temporary element
-      document.body.removeChild(tempContainer);
-
-      const imgData = canvas.toDataURL("image/png");
-
-      // Set up jsPDF page format (A4)
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
+      // Call backend API to generate PDF
+      const response = await fetch('http://localhost:5001/api/generate-ticket-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: savedTicket.id,
+          companyName: savedTicket.companyName,
+          selectedPackage: savedTicket.selectedPackage,
+          price: savedTicket.price,
+          contactPerson: savedTicket.contactPerson,
+          phone: savedTicket.phone,
+          whatsapp: savedTicket.whatsapp,
+        }),
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'فشل توليد PDF');
+      }
 
-      // We want to center the ticket image beautifully inside the A4 page
-      const imgWidth = 150; // standard width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      const xOffset = (pdfWidth - imgWidth) / 2;
-      const yOffset = (pdfHeight - imgHeight) / 2;
-
-      // Draw elegant deep brand backdrop
-      pdf.setFillColor(3, 11, 26); // #030b1a
-      pdf.rect(0, 0, pdfWidth, pdfHeight, "F");
-
-      // Draw subtle gold double frame
-      pdf.setDrawColor(212, 175, 55); // #d4af37
-      pdf.setLineWidth(0.8);
-      pdf.rect(8, 8, pdfWidth - 16, pdfHeight - 16, "D");
+      // Create blob from response
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       
-      pdf.setDrawColor(212, 175, 55);
-      pdf.setLineWidth(0.3);
-      pdf.rect(10, 10, pdfWidth - 20, pdfHeight - 20, "D");
-
-      // Add actual ticket image
-      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
-
-      // Save the resulting PDF file
-      const fileName = `Expo_Masr_2026_Ticket_${savedTicket?.id || "REG-2026"}.pdf`;
-      pdf.save(fileName);
+      // Create download link
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Expo_Masr_2026_Ticket_${savedTicket.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up
+      window.URL.revokeObjectURL(url);
 
       setModalState({
         type: 'success',
@@ -299,7 +271,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       setModalState({
         type: 'error',
         title: '❌ خطأ في إنشاء الملف',
-        message: `عذراً، حدث خطأ أثناء إنشاء ملف الـ PDF:\n\n${err.message}\n\nيرجى محاولة تصوير تذكرة الحجز بهاتفك مؤقتًا.`
+        message: `عذراً، حدث خطأ أثناء إنشاء ملف الـ PDF:\n\n${err.message}`
       });
     } finally {
       setIsDownloadingPdf(false);

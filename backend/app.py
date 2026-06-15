@@ -7,6 +7,12 @@ from functools import wraps
 from flask import Flask, request, jsonify, g, render_template, redirect, url_for, session, Response
 from flask_cors import CORS
 
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.units import cm, mm
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 try:
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -223,9 +229,149 @@ def admin_export():
     )
 
 
-@app.route('/admin/export-excel')
+@app.route('/api/generate-ticket-pdf', methods=['POST'])
 @login_required
-def admin_export_excel():
+def generate_ticket_pdf():
+    """توليد PDF للتذكرة من الـ backend"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'بيانات غير صالحة'}), 400
+        
+        # Extract booking data
+        booking_id = data.get('id', 'REG-2026')
+        company_name = data.get('companyName', 'شركة')
+        package = data.get('selectedPackage', 'حزمة قياسية')
+        price = data.get('price', 0)
+        contact_person = data.get('contactPerson', 'المسؤول')
+        phone = data.get('phone', '---')
+        whatsapp = data.get('whatsapp', '---')
+        
+        # Create PDF in memory
+        output = io.BytesIO()
+        
+        # Setup PDF with A4 size in portrait mode
+        pdf_width, pdf_height = A4
+        c = canvas.Canvas(output, pagesize=A4)
+        
+        # Set colors
+        dark_blue = (3/255, 11/255, 26/255)  # #030b1a
+        gold = (212/255, 175/255, 55/255)    # #d4af37
+        
+        # Draw dark blue background
+        c.setFillColor(*dark_blue)
+        c.rect(0, 0, pdf_width, pdf_height, fill=1, stroke=0)
+        
+        # Draw gold borders
+        c.setLineWidth(2)
+        c.setStrokeColor(*gold)
+        c.rect(1*cm, 1*cm, pdf_width-2*cm, pdf_height-2*cm)
+        
+        c.setLineWidth(0.5)
+        c.rect(0.7*cm, 0.7*cm, pdf_width-1.4*cm, pdf_height-1.4*cm)
+        
+        # Title
+        c.setFont("Helvetica-Bold", 28)
+        c.setFillColor(*gold)
+        c.drawCentredString(pdf_width/2, pdf_height - 2*cm, "معرض مصر 2026")
+        
+        # Subtitle
+        c.setFont("Helvetica-Bold", 14)
+        c.setFillColor(1, 1, 1)
+        c.drawCentredString(pdf_width/2, pdf_height - 2.5*cm, "رخصة وتأكيد الجناح")
+        
+        # Draw a line separator
+        c.setLineWidth(1)
+        c.setStrokeColor(*gold)
+        c.line(1.5*cm, pdf_height - 2.8*cm, pdf_width - 1.5*cm, pdf_height - 2.8*cm)
+        
+        # Ticket details
+        y_position = pdf_height - 3.5*cm
+        line_height = 0.6*cm
+        
+        # Company info section
+        c.setFont("Helvetica-Bold", 11)
+        c.setFillColor(*gold)
+        c.drawString(1.5*cm, y_position, "بيانات الشركة")
+        y_position -= line_height
+        
+        c.setFont("Helvetica", 10)
+        c.setFillColor(1, 1, 1)
+        
+        # Company name
+        c.drawString(2*cm, y_position, f"اسم الشركة: {company_name}")
+        y_position -= line_height
+        
+        # Contact person
+        c.drawString(2*cm, y_position, f"المسؤول: {contact_person}")
+        y_position -= line_height
+        
+        # Phone & WhatsApp on same line
+        c.drawString(2*cm, y_position, f"الهاتف: {phone}")
+        c.drawString(4.5*cm, y_position, f"واتساب: {whatsapp}")
+        y_position -= line_height * 1.5
+        
+        # Package info section
+        c.setFont("Helvetica-Bold", 11)
+        c.setFillColor(*gold)
+        c.drawString(1.5*cm, y_position, "تفاصيل الحجز")
+        y_position -= line_height
+        
+        c.setFont("Helvetica", 10)
+        c.setFillColor(1, 1, 1)
+        
+        # Package
+        c.drawString(2*cm, y_position, f"الباقة: {package}")
+        y_position -= line_height
+        
+        # Price
+        c.drawString(2*cm, y_position, f"السعر: {price:,.2f} ج.م")
+        y_position -= line_height
+        
+        # Booking ID
+        c.drawString(2*cm, y_position, f"رقم الحجز: {booking_id}")
+        y_position -= line_height * 1.5
+        
+        # Important notes section
+        c.setFont("Helvetica-Bold", 10)
+        c.setFillColor(*gold)
+        c.drawString(1.5*cm, y_position, "ملاحظات مهمة:")
+        y_position -= line_height
+        
+        c.setFont("Helvetica", 9)
+        c.setFillColor(1, 1, 1)
+        
+        notes = [
+            "✓ يرجى الاحتفاظ بهذه الرخصة وإحضارها يوم المعرض",
+            "✓ تأكد من صحة جميع البيانات المدرجة أعلاه",
+            "✓ للاستفسارات يرجى التواصل عبر واتساب أو الهاتف",
+        ]
+        
+        for note in notes:
+            c.drawString(2*cm, y_position, note)
+            y_position -= line_height
+        
+        # Footer
+        y_position = 1.5*cm
+        c.setFont("Helvetica", 8)
+        c.setFillColor(0.7, 0.7, 0.7)
+        c.drawCentredString(pdf_width/2, y_position, f"تم إنشاء هذه الرخصة في {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        
+        # Finalize PDF
+        c.save()
+        output.seek(0)
+        
+        return Response(
+            output.getvalue(),
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename=expo_masr_ticket_{booking_id}.pdf'}
+        )
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+
     """تصدير البيانات بصيغة Excel احترافية مع تنسيق مميز"""
     if not HAS_OPENPYXL:
         return jsonify({'success': False, 'error': 'مكتبة Excel غير مثبتة'}), 500
