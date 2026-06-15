@@ -17,14 +17,28 @@ import PriceCalculator from './components/PriceCalculator';
 import RegistrationSection from './components/RegistrationSection';
 import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
+import SplashScreen from './components/SplashScreen';
+import { AnimatePresence, motion } from 'motion/react';
 
 // Review rating icons helper
 import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle, ArrowRight, Sparkles, LayoutGrid, Share2 } from 'lucide-react';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState<boolean>(true);
   const [selectedPkgId, setSelectedPkgId] = useState<string>('professional');
   const [currentView, setCurrentView] = useState<'home' | 'booth'>('home');
   const [selectedBoothId, setSelectedBoothId] = useState<'contracting' | 'realestate' | 'decor'>('contracting');
+
+  useEffect(() => {
+    if (showSplash) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showSplash]);
 
   const handleSelectPackage = (packageId: string) => {
     setSelectedPkgId(packageId);
@@ -129,7 +143,21 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#030b1a] text-slate-100 overflow-hidden font-sans">
+    <>
+      <AnimatePresence mode="wait">
+        {showSplash && (
+          <motion.div
+            key="splash"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -40, filter: 'blur(10px)', transition: { duration: 0.8, ease: 'easeInOut' } }}
+            className="fixed inset-0 z-[9999]"
+          >
+            <SplashScreen onComplete={() => setShowSplash(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="min-h-screen bg-[#030b1a] text-slate-100 overflow-hidden font-sans">
       
       {/* Visual Ambient Light Spots */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -907,5 +935,6 @@ export default function App() {
       <Footer />
 
     </div>
+  </>
   );
 }

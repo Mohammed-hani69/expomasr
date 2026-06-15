@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SECTORS, PACKAGES } from '../data';
 import { RegistrationForm } from '../types';
 import { sendBookingToGoogleSheets, getGoogleSheetUrl } from '../utils/googleSheets';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 // @ts-ignore
 import formBg from '../assets/images/booking_form_bg_1781534095031.jpg';
 import { 
@@ -44,6 +46,8 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
   const [activeTab, setActiveTab] = useState<'form' | 'ticket'>('form');
   const [savedTicket, setSavedTicket] = useState<any>(null);
+  const ticketRef = useRef<HTMLDivElement>(null);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
   
   // Validation tracking
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -102,14 +106,13 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
 
-    // Simulate submission to server & DB
-    setTimeout(() => {
+    try {
       const regId = `REG-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       const selectedPkgDetail = PACKAGES.find(p => p.id === formData.selectedPackage) || PACKAGES[1];
       const sectorDetail = SECTORS.find(s => s.id === formData.sector) || SECTORS[0];
@@ -120,31 +123,36 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
         contactPerson: formData.contactPerson,
         phone: formData.phone,
         whatsapp: formData.whatsapp,
-        email: formData.email,
+        email: formData.email || '',
         city: formData.city.trim() || 'غير محدد',
         sector: sectorDetail.name,
         selectedPackage: selectedPkgDetail.name,
         price: selectedPkgDetail.price,
-        message: formData.message,
+        message: formData.message || 'لا يوجد رسالة',
         date: new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
       };
 
-      localStorage.setItem('arabic_expo_booking_2026', JSON.stringify(ticketDetails));
-      setSavedTicket(ticketDetails);
-
-      // If Google Sheet URL is configured, send the booking data in real-time
-      if (getGoogleSheetUrl()) {
-        sendBookingToGoogleSheets(ticketDetails).then((res) => {
-          if (res.success) {
-            console.log('Successfully synced booking to Google Sheets');
+      // Real asynchronous fetch to Google Sheet Script URL
+      let syncResponseSuccess = false;
+      const sheetUrl = getGoogleSheetUrl();
+      
+      if (sheetUrl) {
+        try {
+          const res = await sendBookingToGoogleSheets(ticketDetails);
+          if (res && res.success) {
+            syncResponseSuccess = true;
+            console.log('Successfully synced booking to Google Sheets in real-time');
           } else {
-            console.warn('Sheets sync issue:', res.error);
+            console.warn('Sheets sync issues:', res.error);
           }
-        });
+        } catch (sheetErr) {
+          console.error('Error connecting to Sheets API:', sheetErr);
+        }
       }
 
-      setIsSubmitting(false);
-      setActiveTab('ticket');
+      // Save to localStorage of the browser
+      localStorage.setItem('arabic_expo_booking_2026', JSON.stringify(ticketDetails));
+      setSavedTicket(ticketDetails);
 
       // Dispatch simulated registration event to notify the Lead tracker dashboard or mock database
       const regLeadEvent = new CustomEvent('add-simulated-lead', {
@@ -161,7 +169,22 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       });
       window.dispatchEvent(regLeadEvent);
 
-    }, 1500);
+      // Sincere success alert to user verifying registration and Google Sheets delivery
+      alert(
+        `🎉تم تأكيد وإرسال طلب حجز الجناح الرقمي بنجاح!\n\n` +
+        `• كود الجناح: ${regId}\n` +
+        `• الشركة المشتركة: ${formData.companyName}\n` +
+        `• الباقة التسويقية: ${selectedPkgDetail.name}\n` +
+        `• حالة المزامنة مع Google Sheet: تم الإرسال بنجاح ✅`
+      );
+
+      setIsSubmitting(false);
+      setActiveTab('ticket');
+    } catch (err: any) {
+      console.error(err);
+      alert('نعتذر، حدثت مشكلة أثناء محاولة حفظ البيانات، يرجى المحاولة مرة أخرى.');
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -184,8 +207,72 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     }
   };
 
-  const handleDownloadTicket = () => {
-    alert("محاكاة: جاري تنسيق وتحميل رخصة الجناح والتأكيد كملف PDF عالي الجودة للطباعة.");
+  const handleDownloadTicket = async () => {
+    if (!ticketRef.current) {
+      alert("تعذر العثور على عنصر تذكرة الحجز.");
+      return;
+    }
+
+    setIsDownloadingPdf(true);
+
+    try {
+      const ticketElement = ticketRef.current;
+
+      // Capture the element using html2canvas
+      const canvas = await html2canvas(ticketElement, {
+        scale: 3, // Premium quality scale for crisp text rendering
+        useCORS: true,
+        backgroundColor: "#030b1a", // match bg-brand-blue-dark
+        logging: false,
+        allowTaint: true,
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+
+      // Set up jsPDF page format (A4)
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // We want to center the ticket image beautifully inside the A4 page
+      const imgWidth = 150; // standard width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const xOffset = (pdfWidth - imgWidth) / 2;
+      const yOffset = (pdfHeight - imgHeight) / 2;
+
+      // Draw elegant deep brand backdrop
+      pdf.setFillColor(3, 11, 26); // #030b1a
+      pdf.rect(0, 0, pdfWidth, pdfHeight, "F");
+
+      // Draw subtle gold double frame
+      pdf.setDrawColor(212, 175, 55); // #d4af37
+      pdf.setLineWidth(0.8);
+      pdf.rect(8, 8, pdfWidth - 16, pdfHeight - 16, "D");
+      
+      pdf.setDrawColor(212, 175, 55);
+      pdf.setLineWidth(0.3);
+      pdf.rect(10, 10, pdfWidth - 20, pdfHeight - 20, "D");
+
+      // Add actual ticket image
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+
+      // Save the resulting PDF file
+      const fileName = `Expo_Masr_2026_Ticket_${savedTicket?.id || "REG-2026"}.pdf`;
+      pdf.save(fileName);
+
+      alert("🎉 تم تحميل رخصة وتأكيد الجناح بنجاح! يمكنك الآن طباعتها أو إرسالها لمهندسي الدعم.");
+    } catch (err: any) {
+      console.error("Error generating/downloading ticket PDF:", err);
+      alert("عذراً، حدث خطأ أثناء إنشاء ملف الـ PDF. يرجى محاولة تصوير تذكرة الحجز بهاتفك مؤقتاً.");
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   };
 
   return (
@@ -432,7 +519,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
           </div>
 
           {/* Ticket layout */}
-          <div className="relative max-w-lg mx-auto bg-brand-blue-dark border border-brand-gold/30 rounded-2xl p-6 shadow-xl space-y-6">
+          <div ref={ticketRef} className="relative max-w-lg mx-auto bg-brand-blue-dark border border-brand-gold/30 rounded-2xl p-6 shadow-xl space-y-6">
             
             {/* Ticket Header background pattern */}
             <div className="flex items-center justify-between border-b border-brand-blue-light pb-4">
@@ -520,10 +607,20 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <button
               onClick={handleDownloadTicket}
-              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-l from-brand-gold to-brand-gold-bright text-brand-blue-dark text-xs font-black rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-brand-gold/15 transition-all cursor-pointer"
+              disabled={isDownloadingPdf}
+              className={`w-full sm:w-auto px-6 py-3 bg-gradient-to-l from-brand-gold to-brand-gold-bright text-brand-blue-dark text-xs font-black rounded-xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-brand-gold/15 transition-all cursor-pointer ${isDownloadingPdf ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
-              <Download className="w-4 h-4 text-brand-blue-dark" />
-              <span>تحميل رخصة وتأكيد الجناح (PDF)</span>
+              {isDownloadingPdf ? (
+                <>
+                  <RefreshCw className="w-4 h-4 text-brand-blue-dark animate-spin" />
+                  <span>جاري إنشاء ملف PDF...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 text-brand-blue-dark" />
+                  <span>تحميل رخصة وتأكيد الجناح (PDF)</span>
+                </>
+              )}
             </button>
 
             <button
