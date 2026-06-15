@@ -49,7 +49,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-الخادم سيعمل على: `http://localhost:5000`
+الخادم سيعمل على: `http://localhost:5001`
 
 ## 🔑 متغيرات البيئة
 
@@ -61,7 +61,7 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=your_secure_password
 
 # Backend URL
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5001
 ```
 
 ## 📁 هيكل المشروع
@@ -92,7 +92,7 @@ expomasr/
 ## 👤 حساب الأدمن
 
 الوصول إلى لوحة التحكم:
-- الرابط: `http://localhost:5000/admin/login`
+- الرابط: `http://localhost:5001/admin/login`
 - اسم المستخدم: `admin`
 - كلمة المرور: تغيير عبر متغيرات البيئة
 
