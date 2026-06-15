@@ -86,8 +86,8 @@ export const DIGITAL_BOOTHS: Record<string, DigitalBooth> = {
         imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop"
       }
     ],
-    whatsappNumber: "201012345678",
-    phoneNumber: "01012345678",
+    whatsappNumber: "201033607749",
+    phoneNumber: "01145425207",
     email: "info@albonyan-eg.com"
   },
   realestate: {

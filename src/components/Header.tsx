@@ -61,21 +61,22 @@ export default function Header() {
           
           {/* Logo & Brand ID */}
           <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#d4af37] to-[#aa8a2e] rounded-lg flex items-center justify-center font-bold text-[#030b1a] text-xl italic shadow-lg shadow-brand-gold/10">
-              E
+            <div className="relative w-11 h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border-2 border-brand-gold/50 rounded-xl flex items-center justify-center font-black text-brand-gold text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden">
+              <span className="font-extrabold tracking-tighter italic">EM</span>
+              <div className="absolute inset-0 bg-gradient-to-tr from-brand-gold/10 to-transparent pointer-events-none"></div>
             </div>
-            <div>
+            <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold tracking-wider text-[#d4af37] bg-[#d4af37]/10 px-2 py-0.5 rounded-full border border-white/10 xs:inline-block hidden">حدث 2026 Virtual</span>
-                <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded-full border border-brand-gold/20 xs:inline-block hidden">إكسبو مصر 2026</span>
+                <span className="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   نشط الآن
                 </span>
               </div>
-              <h1 className="text-sm sm:text-base font-bold text-[#d4af37] tracking-tight leading-none mt-1">
-                المعرض الرقمي للبناء والتشطيبات
+              <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight leading-none mt-1">
+                إكسبو مصر <span className="text-brand-gold font-bold">للبناء والعقارات</span>
               </h1>
-              <p className="text-[9px] text-white/50 tracking-widest uppercase">Digital Expo Egypt 2026</p>
+              <p className="text-[10px] text-brand-gold/90 font-mono tracking-wider font-semibold mt-0.5">expomasr.online</p>
             </div>
           </div>
 

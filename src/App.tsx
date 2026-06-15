@@ -133,13 +133,16 @@ export default function App() {
 
       {/* HERO SECTION */}
       <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background Image showing clearly and cleanly */}
+        {/* Background Video loop showing clearly and cleanly with an exquisite luxury architectural vibe */}
         <div className="absolute inset-0 z-0 select-none pointer-events-none">
-          <img 
-            src="/src/assets/images/cairo_expo_bg_1781526370175.jpg" 
-            alt="Cairo Expo Background Banner" 
-            className="w-full h-full object-cover opacity-100"
-            referrerPolicy="no-referrer"
+          <video
+            src="https://assets.mixkit.co/videos/preview/mixkit-modern-building-with-curved-lines-and-glass-facades-44158-large.mp4"
+            poster="/src/assets/images/cairo_expo_bg_1781526370175.jpg"
+            className="w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
           />
         </div>
 

@@ -33,7 +33,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     phone: '',
     whatsapp: '',
     email: '',
-    city: 'القاهرة',
+    city: '',
     sector: SECTORS[0].id,
     selectedPackage: 'professional',
     message: '',
@@ -92,14 +92,6 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       newErrors.whatsapp = "يرجى كتابة رقم واتساب صحيح (11 رقم يبدأ بـ 01)";
     }
 
-    // Email check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = "البريد الإلكتروني مطلوب لارسال الفواتير وبيانات الجناح";
-    } else if (!emailRegex.test(formData.email.trim())) {
-      newErrors.email = "صيغة البريد الإلكتروني غير صحيحة";
-    }
-
     if (!formData.acceptTerms) {
       newErrors.acceptTerms = "يجب الموافقة على شروط حجز المعرض والالتزام بمواعيد الترويج";
     }
@@ -127,7 +119,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
         phone: formData.phone,
         whatsapp: formData.whatsapp,
         email: formData.email,
-        city: formData.city,
+        city: formData.city.trim() || 'غير محدد',
         sector: sectorDetail.name,
         selectedPackage: selectedPkgDetail.name,
         price: selectedPkgDetail.price,
@@ -180,7 +172,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
         phone: '',
         whatsapp: '',
         email: '',
-        city: 'القاهرة',
+        city: '',
         sector: SECTORS[0].id,
         selectedPackage: 'professional',
         message: '',
@@ -305,48 +297,19 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                 )}
               </div>
 
-              {/* Email */}
-              <div id="form-group-email">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                  <Mail className="w-4 h-4 text-brand-gold" />
-                  البريد الإلكتروني للشركة:
-                </label>
-                <input 
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  placeholder="name@company.com"
-                  className={`w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-1 ${
-                    errors.email 
-                      ? 'border-red-500/80 focus:ring-red-500' 
-                      : 'border-brand-blue-light/80 focus:border-brand-gold focus:ring-brand-gold/30'
-                  }`}
-                />
-                {errors.email && (
-                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" />{errors.email}</p>
-                )}
-              </div>
-
-              {/* City */}
-              <div id="form-group-city">
+              {/* City (Manual Input & Optional) */}
+              <div id="form-group-city" className="md:col-span-2">
                 <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-brand-gold" />
-                  المدينة / محافظة المقر:
+                  المدينة / محافظة المقر <span className="text-slate-500 font-normal text-xs">(اختياري - كتابة يدوية)</span>:
                 </label>
-                <select
+                <input 
+                  type="text"
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30"
-                >
-                  <option value="القاهرة">القاهرة</option>
-                  <option value="الجيزة">الجيزة</option>
-                  <option value="الإسكندرية">الإسكندرية</option>
-                  <option value="القليوبية">القليوبية</option>
-                  <option value="الغربية">الغربية</option>
-                  <option value="الدقهلية">الدقهلية</option>
-                  <option value="الشرقية">الشرقية</option>
-                  <option value="محافظة أخرى">محافظة أخرى</option>
-                </select>
+                  placeholder="مثال: القاهرة، الجيزة، الإسكندرية (أو اتركه فارغاً)"
+                  className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 text-right"
+                />
               </div>
 
               {/* Sector */}

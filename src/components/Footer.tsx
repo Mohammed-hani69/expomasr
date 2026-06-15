@@ -20,11 +20,12 @@ export default function Footer() {
           {/* Column 1: App Brand Card (md:5 cols) */}
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center space-x-3 space-x-reverse">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-gold to-brand-gold-bright flex items-center justify-center">
-                <ShieldCheck className="h-5 w-5 text-brand-blue-dark font-black" />
+              <div className="relative w-11 h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border-2 border-brand-gold/50 rounded-xl flex items-center justify-center font-black text-brand-gold text-lg shadow-[0_4px_12px_rgba(212,175,55,0.25)] overflow-hidden">
+                <span className="font-extrabold tracking-tighter italic">EM</span>
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-gold/10 to-transparent pointer-events-none"></div>
               </div>
               <h1 className="text-base sm:text-lg font-black text-white leading-none">
-                المعرض الرقمي <span className="text-brand-gold font-black">للبناء والتشطيبات 2026</span>
+                إكسبو مصر <span className="text-brand-gold font-black">expomasr.online</span>
               </h1>
             </div>
             
@@ -72,8 +73,8 @@ export default function Footer() {
                   <Mail className="w-4 h-4 text-brand-gold" />
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-500 block">البريد الإلكتروني للقرية المعمارية:</span>
-                  <a href="mailto:expo@egy-const-2026.com" className="text-slate-200 hover:text-brand-gold font-mono block">expo@egy-const-2026.com</a>
+                  <span className="text-[10px] text-slate-500 block">البريد الإلكتروني للمعرض:</span>
+                  <a href="mailto:info@expomasr.online" className="text-slate-200 hover:text-brand-gold font-mono block">info@expomasr.online</a>
                 </div>
               </li>
 
@@ -83,7 +84,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-500 block">الهاتف والدعم التجاري:</span>
-                  <a href="tel:+201012345678" className="text-slate-200 hover:text-brand-gold font-mono block">01012345678 (20+)</a>
+                  <a href="tel:+201145425207" className="text-slate-200 hover:text-brand-gold font-mono block">01145425207</a>
                 </div>
               </li>
 
@@ -93,7 +94,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-500 block">قناة حجز الواتساب الفورية:</span>
-                  <a href="https://wa.me/201012345678" target="_blank" rel="noreferrer" className="text-slate-200 hover:text-brand-gold font-mono block">201012345678+</a>
+                  <a href="https://wa.me/201033607749" target="_blank" rel="noreferrer" className="text-slate-200 hover:text-brand-gold font-mono block">+20 10 33607749</a>
                 </div>
               </li>
 
@@ -117,8 +118,8 @@ export default function Footer() {
         <div className="border-t border-brand-blue-light/40 pt-8 mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
           
           <div className="text-xs text-slate-500 leading-tight">
-            <span>© {currentYear} المعرض الرقمي للبناء والتشطيبات والعقارات م.م. جميع الحقوق الفكرية والتسويقية محفوظة.</span>
-            <span className="block mt-1 sm:inline sm:mt-0 sm:mr-1">مرخص ومعتمد من الهيئة المصرية العامة للمعارض والمؤتمرات الافتراضية.</span>
+            <span>© {currentYear} إكسبو مصر - expomasr.online. جميع الحقوق الفكرية والتسويقية محفوظة.</span>
+            <span className="block mt-1 sm:inline sm:mt-0 sm:mr-1">مرخص ومعتمد من الهيئة المصرية للمعارض والمؤتمرات الرقمية.</span>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-semibold">

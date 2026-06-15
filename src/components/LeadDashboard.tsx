@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { INITIAL_MOCK_LEADS } from '../data';
 import { MockLead } from '../types';
-import GoogleSheetsSettings from './GoogleSheetsSettings';
 import { 
   Users, 
   TrendingUp, 
@@ -296,9 +295,6 @@ export default function LeadDashboard() {
           <strong>ميزة المزامنة الحية:</strong> عند إرسال أي طلب عرض أسعار تجريبي من نموذج الجناح أعلاه، سيتدفق الطلب فوراً إلى لوحة التحكم هذه كبيانات حية ومباشرة. يثبت هذا النظام كفاءة وصول البيانات الفورية لكل شركة عارضة.
         </p>
       </div>
-
-      {/* Live Google Sheets settings panel integration */}
-      <GoogleSheetsSettings />
 
     </div>
   );

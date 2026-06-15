@@ -5,8 +5,27 @@
  */
 
 const STORAGE_KEY = 'arabic_expo_sheet_url_2026';
+const SPREADSHEET_KEY = 'arabic_expo_spreadsheet_url_2026';
+const DEFAULT_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1Jry9IRd3_qcCs531---5wmrOmb-oNukAuE-n3EX460k/edit?usp=sharing';
+
+export function getSpreadsheetUrl(): string {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem(SPREADSHEET_KEY) || DEFAULT_SPREADSHEET_URL;
+  }
+  return DEFAULT_SPREADSHEET_URL;
+}
+
+export function setSpreadsheetUrl(url: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(SPREADSHEET_KEY, url.trim());
+  }
+}
 
 export function getGoogleSheetUrl(): string {
+  const envUrl = (import.meta as any).env?.VITE_GOOGLE_SCRIPT_URL;
+  if (envUrl && envUrl.trim() !== '' && !envUrl.includes('...')) {
+    return envUrl.trim();
+  }
   if (typeof window !== 'undefined') {
     return localStorage.getItem(STORAGE_KEY) || '';
   }
