@@ -1,3 +1,7 @@
+<div align="center">
+<img width="100%" alt="Expo MASR Banner" src="image.png" />
+</div>
+
 # 🏢 معرض معمار مصر الرقمي 2026 - Expo MASR
 
 منصة رقمية تفاعلية لعرض الأجنحة الافتراضية والحجوزات الإلكترونية لمعرض معمار مصر 2026.
