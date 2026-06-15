@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { DIGITAL_BOOTHS } from '../data';
 import { DigitalBooth, Project } from '../types';
 import { 
@@ -18,7 +18,13 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Sparkles
+  Sparkles,
+  Box,
+  Eye,
+  Layers,
+  Compass,
+  HelpCircle,
+  RefreshCw
 } from 'lucide-react';
 
 interface InteractiveBoothProps {
@@ -34,6 +40,7 @@ export default function InteractiveBooth({
 }: InteractiveBoothProps) {
   const [activeSector, setActiveSector] = useState<'contracting' | 'realestate' | 'decor'>(initialSector);
   const [activeTab, setActiveTab] = useState<'about' | 'gallery' | 'projects'>('about');
+  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
 
   // 3D Isometric Viewport States
   const [rotationY, setRotationY] = useState(-18);
@@ -41,6 +48,11 @@ export default function InteractiveBooth({
   const [zoom, setZoom] = useState(0.95);
   const [isAutoRotating, setIsAutoRotating] = useState(true);
   const [hoveredHotspot, setHoveredHotspot] = useState<string | null>(null);
+
+  // Drag states
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [dragRot, setDragRot] = useState({ x: 14, y: -18 });
 
   // Dynamic automatic 3D Orbit timer
   useEffect(() => {

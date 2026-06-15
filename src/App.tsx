@@ -132,9 +132,11 @@ export default function App() {
     <div className="min-h-screen bg-[#030b1a] text-slate-100 overflow-hidden font-sans">
       
       {/* Visual Ambient Light Spots */}
-      <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-[#d4af37]/10 rounded-full blur-[160px] pointer-events-none"></div>
-      <div className="absolute top-[1200px] left-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-[180px] pointer-events-none"></div>
-      <div className="absolute bottom-[800px] right-10 w-[450px] h-[450px] bg-[#d4af37]/5 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-[#d4af37]/10 rounded-full blur-[160px] pointer-events-none"></div>
+        <div className="absolute top-[1200px] left-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-[180px] pointer-events-none"></div>
+        <div className="absolute bottom-[800px] right-10 w-[450px] h-[450px] bg-[#d4af37]/5 rounded-full blur-[150px] pointer-events-none"></div>
+      </div>
 
       {/* STICKY HEADER */}
       <Header 

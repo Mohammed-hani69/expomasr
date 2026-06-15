@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Calendar, ShieldCheck, ArrowRight, Home } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface HeaderProps {
   currentView?: 'home' | 'booth';
@@ -66,23 +67,23 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
         <div className="flex items-center justify-between">
           
           {/* Logo & Brand ID */}
-          <div className="flex items-center gap-2 xs:gap-3">
-            <div className="relative w-9 h-9 xs:w-11 xs:h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border border-brand-gold/50 rounded-lg xs:rounded-xl flex items-center justify-center font-black text-brand-gold text-sm xs:text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden shrink-0">
+          <div className="flex items-center gap-1.5 xs:gap-3 min-w-0">
+            <div className="relative w-8 h-8 xs:w-11 xs:h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border border-brand-gold/50 rounded-lg xs:rounded-xl flex items-center justify-center font-black text-brand-gold text-xs xs:text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden shrink-0">
               <span className="font-extrabold tracking-tighter italic">EM</span>
               <div className="absolute inset-0 bg-gradient-to-tr from-brand-gold/10 to-transparent pointer-events-none"></div>
             </div>
             <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[8px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">إكسبو مصر 2026</span>
-                <span className="text-[8px] xs:text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
+              <div className="flex items-center gap-1 xs:gap-1.5 flex-wrap">
+                <span className="text-[7px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">إكسبو مصر 2026</span>
+                <span className="text-[7px] xs:text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   نشط الآن
                 </span>
               </div>
-              <h1 className="text-xs xs:text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight mt-0.5 min-w-0 truncate">
+              <h1 className="text-[10px] xs:text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight leading-tight mt-0.5 min-w-0 truncate">
                 إكسبو مصر <span className="text-brand-gold font-bold">للبناء والعقارات</span>
               </h1>
-              <p className="text-[8px] xs:text-[10px] text-brand-gold/80 font-mono tracking-wider font-semibold mt-px">expomasr.online</p>
+              <p className="text-[7px] xs:text-[10px] text-brand-gold/80 font-mono tracking-wider font-semibold mt-px">expomasr.online</p>
             </div>
           </div>
 
@@ -156,33 +157,50 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
       </div>
 
       {/* Mobile Menu, show/hide based on menu state */}
-      {isOpen && currentView !== 'booth' && (
-        <div className="lg:hidden bg-brand-blue-dark/98 border-b border-brand-blue-light/80" id="mobile-menu">
-          <div className="px-2 pt-2 pb-4 space-y-1 sm:px-3">
-            {menuItems.map((item) => (
-              <a
-                id={`mobile-nav-${item.href.replace('#', '')}`}
-                key={item.href}
-                href={item.href}
-                onClick={(e) => scrollToSection(e, item.href)}
-                className="block px-4 py-3 rounded-xl text-base font-medium text-slate-300 hover:text-brand-gold hover:bg-brand-blue-light/50 transition-colors duration-200"
+      <AnimatePresence>
+        {isOpen && currentView !== 'booth' && (
+          <motion.div
+            id="mobile-menu"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ type: "spring", bounce: 0.05, duration: 0.4 }}
+            className="lg:hidden bg-brand-blue-dark/98 backdrop-blur-lg border-b border-brand-blue-light/80 overflow-hidden shadow-2xl"
+          >
+            <div className="px-4 pt-3 pb-6 space-y-1 sm:px-6">
+              {menuItems.map((item, index) => (
+                <motion.a
+                  id={`mobile-nav-${item.href.replace('#', '')}`}
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => scrollToSection(e, item.href)}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.03 + 0.1 }}
+                  className="block px-4 py-3 rounded-xl text-base font-medium text-slate-300 hover:text-brand-gold hover:bg-white/5 active:bg-white/10 border border-transparent hover:border-white/5 transition-all duration-200"
+                >
+                  {item.label}
+                </motion.a>
+              ))}
+              <motion.div 
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: menuItems.length * 0.03 + 0.15 }}
+                className="pt-4 mt-3 border-t border-white/10 px-4"
               >
-                {item.label}
-              </a>
-            ))}
-            <div className="pt-4 pb-2 border-t border-white/10 px-4">
-              <a
-                id="mobile-header-cta"
-                href="#register-section"
-                onClick={(e) => scrollToSection(e, '#register-section')}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-full bg-white text-[#030b1a] hover:bg-[#d4af37] text-center font-bold text-sm"
-              >
-                <span>احجز جناحك الآن</span>
-              </a>
+                <a
+                  id="mobile-header-cta"
+                  href="#register-section"
+                  onClick={(e) => scrollToSection(e, '#register-section')}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-full bg-gradient-to-l from-brand-gold to-brand-gold-bright text-[#030b1a] hover:shadow-lg hover:shadow-brand-gold/20 active:scale-[0.98] transition-all text-center font-bold text-sm cursor-pointer"
+                >
+                  <span>احجز جناحك الآن</span>
+                </a>
+              </motion.div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
