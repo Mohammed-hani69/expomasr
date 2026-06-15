@@ -23,7 +23,7 @@ export function setSpreadsheetUrl(url: string): void {
 
 export function getGoogleSheetUrl(): string {
   // Statically hardcoded URL per user request for seamless zero-setup deployments (no .env required)
-  return "https://script.google.com/macros/s/AKfycby3AaEZ8begE5t19TIZgzWIe77ubs3c0OQM7nC24CN2nUVVlE_45rBxQEpXoBFEXXxu/exec";
+  return "https://script.google.com/macros/s/AKfycbyG5ZlrFKovJOa0r9TGZ1gg7WQCFwQIgZS0h2cLuK2TqGiroC4VhkC33c1itlpUD1_P/exec";
 }
 
 export function setGoogleSheetUrl(url: string): void {
@@ -52,8 +52,7 @@ export async function sendBookingToGoogleSheets(data: {
   }
 
   try {
-    // We send payload as a URLSearchParams string (x-www-form-urlencoded).
-    // This is treated as a "simple request" by modern browsers, meaning zero CORS preflight issues or headers mismatch.
+    // 1. Construct URL search parameters
     const params = new URLSearchParams();
     params.append('id', data.id || '');
     params.append('companyName', data.companyName || '');
@@ -68,17 +67,26 @@ export async function sendBookingToGoogleSheets(data: {
     params.append('message', data.message || '');
     params.append('date', data.date || '');
 
-    // Send the real request to Google script
-    await fetch(url, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
+    // 2. Generate the ultimate multi-channel URL
+    // By appending params directly as query parameters, Google Apps Script's e.parameter handles them 
+    // flawlessly FIRST, even if the browser strips or filters the POST body due to strict tracking / adblockers.
+    const finalUrl = `${url}?${params.toString()}`;
+
+    console.log('Sending registration payload to Google Sheets:', {
+      endpoint: finalUrl,
+      fieldsCount: params.size,
+      leadId: data.id,
     });
 
-    // Directly return success since no-cors hides response specifics but guarantees delivery in normal client networks
+    // 3. Make a browser-native CORS-friendly request using URLSearchParams directly as body
+    // This forces the client to automatically send "application/x-www-form-urlencoded"
+    // and satisfies "simple request" requirements under CORS spec (no preflight OPTIONS check).
+    await fetch(finalUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: params, // Passes the search params natively (highly supported by App Script)
+    });
+
     return { success: true };
   } catch (error: any) {
     console.error('Error sending booking to Google Sheets:', error);
