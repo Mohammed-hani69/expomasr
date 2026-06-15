@@ -1,2 +1,4 @@
 flask==3.1.1
 flask-cors==5.0.1
+openpyxl==3.11.2
+xlsxwriter==3.1.9

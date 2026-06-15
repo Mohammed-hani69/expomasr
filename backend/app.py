@@ -7,6 +7,14 @@ from functools import wraps
 from flask import Flask, request, jsonify, g, render_template, redirect, url_for, session, Response
 from flask_cors import CORS
 
+try:
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    from openpyxl.utils import get_column_letter
+    HAS_OPENPYXL = True
+except ImportError:
+    HAS_OPENPYXL = False
+
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'expo-masr-2026-secret-key-change-in-production')
 CORS(app)
@@ -197,6 +205,7 @@ def admin_dashboard():
 @app.route('/admin/export')
 @login_required
 def admin_export():
+    """تصدير البيانات بصيغة CSV"""
     db = get_db()
     rows = db.execute('SELECT * FROM bookings ORDER BY created_at DESC').fetchall()
 
@@ -211,6 +220,89 @@ def admin_export():
         csv_bytes,
         mimetype='text/csv; charset=utf-8',
         headers={'Content-Disposition': f'attachment; filename=expo_masr_bookings_{datetime.now().strftime("%Y%m%d")}.csv'}
+    )
+
+
+@app.route('/admin/export-excel')
+@login_required
+def admin_export_excel():
+    """تصدير البيانات بصيغة Excel احترافية مع تنسيق مميز"""
+    if not HAS_OPENPYXL:
+        return jsonify({'success': False, 'error': 'مكتبة Excel غير مثبتة'}), 500
+    
+    db = get_db()
+    rows = db.execute('SELECT * FROM bookings ORDER BY created_at DESC').fetchall()
+    
+    # إنشاء workbook جديد
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "الحجوزات"
+    
+    # تعيين عرض الأعمدة
+    column_widths = [15, 20, 15, 15, 15, 20, 15, 20, 20, 15, 30, 20]
+    for i, width in enumerate(column_widths, 1):
+        ws.column_dimensions[get_column_letter(i)].width = width
+    
+    # تنسيق الرأس
+    headers = ['كود الحجز', 'اسم الشركة', 'المسؤول', 'الهاتف', 'واتساب', 'البريد', 'المدينة', 'القطاع', 'الباقة', 'السعر', 'الرسالة', 'تاريخ الحجز']
+    
+    # ألوان الذهب والأزرق (ألوان المعرض)
+    gold_fill = PatternFill(start_color='D4AF37', end_color='D4AF37', fill_type='solid')
+    gold_font = Font(bold=True, color='030B1A', size=12, name='Calibri')
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # كتابة رؤوس الأعمدة
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.fill = gold_fill
+        cell.font = gold_font
+        cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        cell.border = border
+    
+    # تنسيق الصفوف
+    data_font = Font(size=11, name='Calibri')
+    alt_fill = PatternFill(start_color='F5F5F5', end_color='F5F5F5', fill_type='solid')
+    
+    for row_idx, row_data in enumerate(rows, 2):
+        # تلوين الصفوف بشكل متناوب
+        row_fill = alt_fill if row_idx % 2 == 0 else PatternFill()
+        
+        values = [
+            row_data['id'],
+            row_data['companyName'],
+            row_data['contactPerson'],
+            row_data['phone'],
+            row_data['whatsapp'],
+            row_data['email'],
+            row_data['city'],
+            row_data['sector'],
+            row_data['selectedPackage'],
+            f"{row_data['price']:,.2f}",
+            row_data['message'],
+            row_data['date']
+        ]
+        
+        for col, value in enumerate(values, 1):
+            cell = ws.cell(row=row_idx, column=col, value=value)
+            cell.font = data_font
+            cell.border = border
+            cell.alignment = Alignment(horizontal='right' if col in [1, 8] else 'left', vertical='center', wrap_text=True)
+            cell.fill = row_fill
+    
+    # إنشاء ملف في الذاكرة
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return Response(
+        output.getvalue(),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'attachment; filename=expo_masr_bookings_{datetime.now().strftime("%Y%m%d")}.xlsx'}
     )
 
 

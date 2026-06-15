@@ -48,10 +48,20 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
   const [savedTicket, setSavedTicket] = useState<any>(null);
   const ticketRef = useRef<HTMLDivElement>(null);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [modalState, setModalState] = useState<{
+    type: 'success' | 'error' | 'confirm' | null;
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    type: null,
+    title: '',
+    message: ''
+  });
   
   // Validation tracking
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync pre-selected package from the calculator component
   useEffect(() => {
@@ -157,46 +167,59 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       const dbStatus = syncResult.success
         ? 'تم الحفظ في قاعدة البيانات بنجاح ✅'
         : `تحذير قاعدة البيانات: ${syncResult.error || 'فشل المزامنة'}`;
-      alert(
-        `🎉تم تأكيد وإرسال طلب حجز الجناح الرقمي بنجاح!\n\n` +
-        `• كود الجناح: ${regId}\n` +
-        `• الشركة المشتركة: ${formData.companyName}\n` +
-        `• الباقة التسويقية: ${selectedPkgDetail.name}\n` +
-        `• ${dbStatus}`
-      );
+      
+      setModalState({
+        type: 'success',
+        title: '🎉 تم التأكيد بنجاح!',
+        message: `تم تأكيد وإرسال طلب حجز الجناح الرقمي بنجاح!\n\n• كود الجناح: ${regId}\n• الشركة: ${formData.companyName}\n• الباقة: ${selectedPkgDetail.name}\n• ${dbStatus}`
+      });
 
       setIsSubmitting(false);
       setActiveTab('ticket');
     } catch (err: any) {
       console.error(err);
-      alert('نعتذر، حدثت مشكلة أثناء محاولة حفظ البيانات، يرجى المحاولة مرة أخرى.');
+      setModalState({
+        type: 'error',
+        title: '❌ حدثت مشكلة',
+        message: 'نعتذر، حدثت مشكلة أثناء محاولة حفظ البيانات، يرجى المحاولة مرة أخرى.'
+      });
       setIsSubmitting(false);
     }
   };
 
   const handleReset = () => {
-    if (confirm("هل تريد إلغاء هذا التأكيد وحجز جناح آخر؟ سيتم حذف التذكرة الحالية من متصفحك.")) {
-      localStorage.removeItem('arabic_expo_booking_2026');
-      setSavedTicket(null);
-      setFormData({
-        companyName: '',
-        contactPerson: '',
-        phone: '',
-        whatsapp: '',
-        email: '',
-        city: '',
-        sector: SECTORS[0].id,
-        selectedPackage: 'professional',
-        message: '',
-        acceptTerms: true
-      });
-      setActiveTab('form');
-    }
+    setModalState({
+      type: 'confirm',
+      title: 'هل أنت متأكد؟',
+      message: 'هل تريد إلغاء هذا التأكيد وحجز جناح آخر؟ سيتم حذف التذكرة الحالية من متصفحك.',
+      onConfirm: () => {
+        localStorage.removeItem('arabic_expo_booking_2026');
+        setSavedTicket(null);
+        setFormData({
+          companyName: '',
+          contactPerson: '',
+          phone: '',
+          whatsapp: '',
+          email: '',
+          city: '',
+          sector: SECTORS[0].id,
+          selectedPackage: 'professional',
+          message: '',
+          acceptTerms: true
+        });
+        setActiveTab('form');
+        setModalState({ type: null, title: '', message: '' });
+      }
+    });
   };
 
   const handleDownloadTicket = async () => {
     if (!ticketRef.current) {
-      alert("تعذر العثور على عنصر تذكرة الحجز.");
+      setModalState({
+        type: 'error',
+        title: '❌ خطأ',
+        message: 'تعذر العثور على عنصر تذكرة الحجز. يرجى التحديث والمحاولة مجددًا.'
+      });
       return;
     }
 
@@ -253,10 +276,18 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       const fileName = `Expo_Masr_2026_Ticket_${savedTicket?.id || "REG-2026"}.pdf`;
       pdf.save(fileName);
 
-      alert("🎉 تم تحميل رخصة وتأكيد الجناح بنجاح! يمكنك الآن طباعتها أو إرسالها لمهندسي الدعم.");
+      setModalState({
+        type: 'success',
+        title: '✅ تم بنجاح!',
+        message: 'تم تحميل رخصة وتأكيد الجناح بنجاح! يمكنك الآن طباعتها أو إرسالها لمهندسي الدعم.'
+      });
     } catch (err: any) {
       console.error("Error generating/downloading ticket PDF:", err);
-      alert("عذراً، حدث خطأ أثناء إنشاء ملف الـ PDF. يرجى محاولة تصوير تذكرة الحجز بهاتفك مؤقتاً.");
+      setModalState({
+        type: 'error',
+        title: '❌ خطأ في إنشاء الملف',
+        message: `عذراً، حدث خطأ أثناء إنشاء ملف الـ PDF:\n\n${err.message}\n\nيرجى محاولة تصوير تذكرة الحجز بهاتفك مؤقتًا.`
+      });
     } finally {
       setIsDownloadingPdf(false);
     }
@@ -621,6 +652,54 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
             <span>سيتصل بك أحد مهندسي الدعم والتخطيط لدينا على رقم <strong>{savedTicket?.phone}</strong> أو عبر الواتساب لإكمال إعداد الكتالوج واختيار ثيمات العرض الفاخرة لشركتك.</span>
           </div>
 
+        </div>
+      )}
+
+      {/* Custom Modal */}
+      {modalState.type && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-brand-blue-dark border border-brand-gold/30 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl animate-in fade-in zoom-in-95">
+            {/* Header */}
+            <div className="mb-4">
+              <h2 className="text-xl sm:text-2xl font-black text-white">{modalState.title}</h2>
+            </div>
+
+            {/* Message */}
+            <div className="mb-6">
+              <p className="text-slate-300 text-sm sm:text-base whitespace-pre-line leading-relaxed">
+                {modalState.message}
+              </p>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
+              {modalState.type === 'confirm' ? (
+                <>
+                  <button
+                    onClick={() => setModalState({ type: null, title: '', message: '' })}
+                    className="px-4 py-2 bg-brand-blue-light/50 border border-brand-blue-light text-slate-300 text-xs font-bold rounded-lg hover:bg-brand-blue-light hover:text-white transition-all"
+                  >
+                    إلغاء
+                  </button>
+                  <button
+                    onClick={() => {
+                      modalState.onConfirm?.();
+                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-brand-gold to-brand-gold-bright text-brand-blue-dark text-xs font-black rounded-lg hover:shadow-lg hover:shadow-brand-gold/15 transition-all"
+                  >
+                    تأكيد
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setModalState({ type: null, title: '', message: '' })}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-brand-gold to-brand-gold-bright text-brand-blue-dark text-xs font-black rounded-lg hover:shadow-lg hover:shadow-brand-gold/15 transition-all"
+                >
+                  حسنًا
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
