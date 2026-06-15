@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { SECTORS, PACKAGES } from '../data';
 import { RegistrationForm } from '../types';
 import { sendBookingToGoogleSheets, getGoogleSheetUrl } from '../utils/googleSheets';
+// @ts-ignore
+import formBg from '../assets/images/booking_form_bg_1781534095031.jpg';
 import { 
   Building2, 
   User, 
@@ -190,9 +192,16 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     <div className="max-w-4xl mx-auto">
       
       {activeTab === 'form' ? (
-        <div className="bg-brand-blue-medium border border-brand-blue-light/60 rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        <div className="bg-brand-blue-medium border border-brand-blue-light/60 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          {/* Creative visual backdrop pattern specifically requested behind the booking form */}
+          <div 
+            className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-[0.14] mix-blend-screen"
+            style={{ backgroundImage: `url(${formBg})` }}
+          />
+          {/* Subtle warm glow underlay */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full blur-3xl pointer-events-none z-0"></div>
           
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 relative z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-gold/10 border border-brand-gold/20 rounded-full text-brand-gold text-xs font-semibold mb-3">
               <Sparkles className="w-4 h-4 text-brand-gold animate-spin" />
               <span>تسجيل فوري مشفّر وآمن لعام 2026</span>
@@ -205,7 +214,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               

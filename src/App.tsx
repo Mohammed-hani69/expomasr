@@ -3,6 +3,10 @@ import * as Icons from 'lucide-react';
 import { SECTORS } from './data';
 // @ts-ignore
 import heroBg from './assets/images/cairo_expo_bg_1781526370175.jpg';
+// @ts-ignore
+import skylineBg from './assets/images/building_skyline_glow_1781533838845.jpg';
+// @ts-ignore
+import blueprintBg from './assets/images/blueprint_ambient_pattern_1781533858181.jpg';
 
 // Import our custom responsive components
 import Header from './components/Header';
@@ -160,16 +164,16 @@ export default function App() {
           </div>
 
           {/* Main Display Heading */}
-          <div className="space-y-4 max-w-4xl mx-auto">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
+          <div className="space-y-4 max-w-4xl mx-auto px-1 xs:px-0">
+            <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
               أكبر معرض رقمي <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold">
                 للبناء والتشطيبات والعقارات
               </span> في مصر 2026
             </h1>
             
-            <div className="max-w-3xl mx-auto bg-slate-950/80 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-5 sm:p-6 shadow-2xl shadow-black/80 mt-6">
-              <p className="text-white text-sm sm:text-base md:text-lg leading-relaxed font-semibold">
+            <div className="max-w-3xl mx-auto bg-slate-950/80 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-4 xs:p-6 shadow-2xl shadow-black/80 mt-6">
+              <p className="text-white text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed font-semibold">
                 اعرض مشاريعك وخدماتك أمام آلاف العملاء والمستثمرين والباحثين عن البناء والتشطيب والعقارات خلال يومين من التسويق المكثف والمحكم.
               </p>
             </div>
@@ -237,8 +241,13 @@ export default function App() {
       </section>
 
       {/* WHY US? - ADVANTAGES SECTION */}
-      <section id="why-us" className="py-20 border-y border-white/5 relative bg-[#030b1a]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="why-us" className="py-20 border-y border-white/5 relative bg-[#030b1a] overflow-hidden">
+        {/* Background Skyline Image with low opacity & majestic blending */}
+        <div 
+          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-20 mix-blend-screen"
+          style={{ backgroundImage: `url(${skylineBg})` }}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs sm:text-sm font-bold text-[#d4af37] tracking-widest bg-[#d4af37]/10 px-3 py-1 rounded-full border border-[#d4af37]/20 font-mono">
@@ -335,8 +344,13 @@ export default function App() {
       </section>
 
       {/* PARTICIPATING SECTORS */}
-      <section id="sectors" className="py-20 bg-[#030b1a] relative border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="sectors" className="py-20 bg-[#030b1a] relative border-t border-white/5 overflow-hidden">
+        {/* Background Blueprint draft image pattern */}
+        <div 
+          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-15 mix-blend-color-dodge"
+          style={{ backgroundImage: `url(${blueprintBg})` }}
+        />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-xs sm:text-sm font-bold text-[#d4af37] tracking-widest bg-[#d4af37]/10 px-3 py-1 rounded-full border border-[#d4af37]/20">

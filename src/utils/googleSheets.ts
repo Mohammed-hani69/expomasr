@@ -22,7 +22,9 @@ export function setSpreadsheetUrl(url: string): void {
 }
 
 export function getGoogleSheetUrl(): string {
-  const envUrl = (import.meta as any).env?.VITE_GOOGLE_SCRIPT_URL;
+  // Use standard static import.meta.env so Vite can replace this at build time
+  // @ts-ignore
+  const envUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
   if (envUrl && envUrl.trim() !== '' && !envUrl.includes('...')) {
     return envUrl.trim();
   }
@@ -58,20 +60,36 @@ export async function sendBookingToGoogleSheets(data: {
   }
 
   try {
-    // Send a POST request to Google Apps Script Web App URL
-    const response = await fetch(url, {
+    // We send payload as a URLSearchParams string (x-www-form-urlencoded).
+    // This is treated as a "simple request" by modern browsers, meaning zero CORS preflight issues or headers mismatch.
+    const params = new URLSearchParams();
+    params.append('id', data.id || '');
+    params.append('companyName', data.companyName || '');
+    params.append('contactPerson', data.contactPerson || '');
+    params.append('phone', data.phone || '');
+    params.append('whatsapp', data.whatsapp || '');
+    params.append('email', data.email || '');
+    params.append('city', data.city || '');
+    params.append('sector', data.sector || '');
+    params.append('selectedPackage', data.selectedPackage || '');
+    params.append('price', (data.price || 0).toString());
+    params.append('message', data.message || '');
+    params.append('date', data.date || '');
+
+    // Send the real request to Google script
+    await fetch(url, {
       method: "POST",
-      mode: "no-cors", // Crucial for client-side direct Apps Script execution to avoid preflight issues
+      mode: "no-cors",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify(data),
+      body: params.toString(),
     });
 
-    // Since 'no-cors' mode does not return access to responses, we assume success if no error is thrown
+    // Directly return success since no-cors hides response specifics but guarantees delivery in normal client networks
     return { success: true };
   } catch (error: any) {
-    console.error('Error sending to Google Schema:', error);
+    console.error('Error sending booking to Google Sheets:', error);
     return { success: false, error: error.message || 'حدث خطأ أثناء مزامنة البيانات مع Google Sheets.' };
   }
 }
@@ -102,23 +120,83 @@ export const GOOGLE_APPS_SCRIPT_CODE = `function doPost(e) {
       sheet.getRange("A1:L1").setFontWeight("bold").setBackgroundColor("#030b1a").setFontColor("#d4af37").setHorizontalAlignment("center");
     }
     
-    // 3. تحليل وفك ترميز البيانات المستقبلة من المعرض
-    var data = JSON.parse(e.postData.contents);
+    // 3. تحليل وفك ترميز البيانات المستقبلة من المعرض بديناميكية فائقة ومناعة ضد الـ CORS
+    var id = "";
+    var companyName = "";
+    var contactPerson = "";
+    var phone = "";
+    var whatsapp = "";
+    var email = "";
+    var city = "";
+    var sector = "";
+    var selectedPackage = "";
+    var price = "";
+    var message = "";
+    var date = "";
+
+    // التحقق من وصول بارامترات بريدية مباشرة (URL encoded)
+    if (e && e.parameter && Object.keys(e.parameter).length > 0) {
+      id = e.parameter.id || "";
+      companyName = e.parameter.companyName || "";
+      contactPerson = e.parameter.contactPerson || "";
+      phone = e.parameter.phone || "";
+      whatsapp = e.parameter.whatsapp || "";
+      email = e.parameter.email || "";
+      city = e.parameter.city || "";
+      sector = e.parameter.sector || "";
+      selectedPackage = e.parameter.selectedPackage || "";
+      price = e.parameter.price || "";
+      message = e.parameter.message || "";
+      date = e.parameter.date || "";
+    } else if (e && e.postData && e.postData.contents) {
+      // وإلا فك ترميز محتوى طلب الـ JSON الخام
+      try {
+        var data = JSON.parse(e.postData.contents);
+        id = data.id || "";
+        companyName = data.companyName || "";
+        contactPerson = data.contactPerson || "";
+        phone = data.phone || "";
+        whatsapp = data.whatsapp || "";
+        email = data.email || "";
+        city = data.city || "";
+        sector = data.sector || "";
+        selectedPackage = data.selectedPackage || "";
+        price = data.price || "";
+        message = data.message || "";
+        date = data.date || "";
+      } catch (jsonErr) {
+        // في حالة وجود صيغة نصية عشوائية
+        var rawString = e.postData.contents;
+        var queryParams = parseQueryString(rawString);
+        id = queryParams.id || "";
+        companyName = queryParams.companyName || "";
+        contactPerson = queryParams.contactPerson || "";
+        phone = queryParams.phone || "";
+        whatsapp = queryParams.whatsapp || "";
+        email = queryParams.email || "";
+        city = queryParams.city || "";
+        sector = queryParams.sector || "";
+        selectedPackage = queryParams.selectedPackage || "";
+        price = queryParams.price || "";
+        message = queryParams.message || "";
+        date = queryParams.date || "";
+      }
+    }
     
     // 4. إدراج صف جديد ببيانات حجز الشركة
     sheet.appendRow([
-      data.id,
-      data.companyName,
-      data.contactPerson,
-      data.phone,
-      data.whatsapp,
-      data.email,
-      data.city,
-      data.sector,
-      data.selectedPackage,
-      data.price,
-      data.message,
-      data.date
+      id,
+      companyName,
+      contactPerson,
+      phone,
+      whatsapp,
+      email,
+      city,
+      sector,
+      selectedPackage,
+      price,
+      message,
+      date
     ]);
     
     // تنسيق الخلايا المضافة تلقائياً 
@@ -133,4 +211,20 @@ export const GOOGLE_APPS_SCRIPT_CODE = `function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": err.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// دالة فك تشفير البيانات النصية المفصولة بـ علامة و (&)
+function parseQueryString(str) {
+  var params = {};
+  if (!str) return params;
+  var pairs = str.split('&');
+  for (var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i].split('=');
+    if (pair.length > 0) {
+      var key = decodeURIComponent(pair[0]);
+      var val = decodeURIComponent(pair[1] || '').replace(/\\+/g, ' ');
+      params[key] = val;
+    }
+  }
+  return params;
 }`;

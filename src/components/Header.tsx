@@ -60,23 +60,23 @@ export default function Header() {
         <div className="flex items-center justify-between">
           
           {/* Logo & Brand ID */}
-          <div className="flex items-center space-x-3 space-x-reverse">
-            <div className="relative w-11 h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border-2 border-brand-gold/50 rounded-xl flex items-center justify-center font-black text-brand-gold text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden">
+          <div className="flex items-center gap-2 xs:gap-3">
+            <div className="relative w-9 h-9 xs:w-11 xs:h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border border-brand-gold/50 rounded-lg xs:rounded-xl flex items-center justify-center font-black text-brand-gold text-sm xs:text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden shrink-0">
               <span className="font-extrabold tracking-tighter italic">EM</span>
               <div className="absolute inset-0 bg-gradient-to-tr from-brand-gold/10 to-transparent pointer-events-none"></div>
             </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded-full border border-brand-gold/20 xs:inline-block hidden">إكسبو مصر 2026</span>
-                <span className="text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
+            <div className="flex flex-col min-w-0">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[8px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">إكسبو مصر 2026</span>
+                <span className="text-[8px] xs:text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   نشط الآن
                 </span>
               </div>
-              <h1 className="text-sm sm:text-base font-extrabold text-white tracking-tight leading-none mt-1">
+              <h1 className="text-xs xs:text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight mt-0.5 min-w-0 truncate">
                 إكسبو مصر <span className="text-brand-gold font-bold">للبناء والعقارات</span>
               </h1>
-              <p className="text-[10px] text-brand-gold/90 font-mono tracking-wider font-semibold mt-0.5">expomasr.online</p>
+              <p className="text-[8px] xs:text-[10px] text-brand-gold/80 font-mono tracking-wider font-semibold mt-px">expomasr.online</p>
             </div>
           </div>
 
@@ -96,7 +96,7 @@ export default function Header() {
           </nav>
 
           {/* CTA Box & Mobile Toggle */}
-          <div className="flex items-center space-x-4 space-x-reverse">
+          <div className="flex items-center gap-1.5 xs:gap-4">
             {/* Bento date badge on desktop */}
             <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#d4af37]/20">
               <span className="text-[9px] text-white/60 uppercase">الموعد القادم للضخ</span>
