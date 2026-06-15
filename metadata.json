@@ -1,0 +1,6 @@
+{
+  "name": "معرض البناء والتشطيبات والعقارات 2026",
+  "description": "المعرض الرقمي المتخصص للبناء والتشطيبات والعقارات 2026 - منصة تفاعلية متطورة لحجز الأجنحة الافتراضية وجذب العملاء والشركات الرائدة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
