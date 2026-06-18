@@ -179,14 +179,19 @@ def get_stats():
 @app.route('/api/videos', methods=['GET'])
 def get_videos():
     try:
-        db = get_db()
-        rows = db.execute('SELECT * FROM videos WHERE active = 1 ORDER BY sort_order ASC, id DESC').fetchall()
         videos = []
-        for row in rows:
-            v = dict(row)
-            if v['video_type'] == 'upload' and v['file_path']:
-                v['url'] = f"/static/uploads/{os.path.basename(v['file_path'])}"
-            videos.append(v)
+        video_extensions = {'.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv', '.wmv'}
+        if os.path.isdir(UPLOAD_FOLDER):
+            for filename in sorted(os.listdir(UPLOAD_FOLDER)):
+                ext = os.path.splitext(filename)[1].lower()
+                if ext in video_extensions:
+                    videos.append({
+                        'id': filename,
+                        'title': os.path.splitext(filename)[0].replace('_', ' ').replace('-', ' '),
+                        'url': f"/static/uploads/{filename}",
+                        'file_name': filename,
+                        'sector': '',
+                    })
         return jsonify({'success': True, 'data': videos})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
