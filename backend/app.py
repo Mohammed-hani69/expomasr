@@ -13,6 +13,19 @@ from reportlab.lib.units import cm, mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+# Register Arabic-supporting font (Arial from Windows)
+_ARIAL_PATH = os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'arial.ttf')
+_ARIAL_BOLD_PATH = os.path.join(os.environ.get('WINDIR', 'C:\\Windows'), 'Fonts', 'arialbd.ttf')
+_ARIAL_REGISTERED = False
+if os.path.exists(_ARIAL_PATH):
+    try:
+        pdfmetrics.registerFont(TTFont('ArabicArial', _ARIAL_PATH))
+        if os.path.exists(_ARIAL_BOLD_PATH):
+            pdfmetrics.registerFont(TTFont('ArabicArial-Bold', _ARIAL_BOLD_PATH))
+        _ARIAL_REGISTERED = True
+    except Exception:
+        pass
+
 try:
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
@@ -22,15 +35,18 @@ except ImportError:
     HAS_OPENPYXL = False
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'expo-masr-2026-secret-key-change-in-production')
+app.secret_key = os.environ.get('SECRET_KEY', 'expo-kitchens-2026-secret-key-change-in-production')
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500MB for video uploads
 # Enable CORS for all routes
 CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type"]}})
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'bookings.db')
+DB_PATH = os.path.join(os.path.dirname(__file__), 'kitchens_bookings.db')
+UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Admin credentials (change in production via env vars)
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'ezezo291')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'ezezo291')
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'kitchens2026')
 
 
 def get_db():
@@ -62,6 +78,19 @@ def init_db():
             price REAL DEFAULT 0,
             message TEXT DEFAULT '',
             date TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS videos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            video_type TEXT NOT NULL DEFAULT 'url',
+            url TEXT DEFAULT '',
+            file_path TEXT DEFAULT '',
+            sector TEXT DEFAULT '',
+            sort_order INTEGER DEFAULT 0,
+            active INTEGER DEFAULT 1,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -116,7 +145,7 @@ def create_booking():
             data.get('date', datetime.now().isoformat()),
         ))
         db.commit()
-        return jsonify({'success': True, 'message': 'تم حفظ الحجز بنجاح', 'id': data['id']}), 201
+        return jsonify({'success': True, 'message': 'تم حفظ حجز المطبخ بنجاح', 'id': data['id']}), 201
     except sqlite3.IntegrityError:
         return jsonify({'success': False, 'error': 'كود الحجز موجود مسبقاً'}), 409
     except Exception as e:
@@ -140,6 +169,22 @@ def get_stats():
         db = get_db()
         total = db.execute('SELECT COUNT(*) as count FROM bookings').fetchone()['count']
         return jsonify({'success': True, 'total': total})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/videos', methods=['GET'])
+def get_videos():
+    try:
+        db = get_db()
+        rows = db.execute('SELECT * FROM videos WHERE active = 1 ORDER BY sort_order ASC, id DESC').fetchall()
+        videos = []
+        for row in rows:
+            v = dict(row)
+            if v['video_type'] == 'upload' and v['file_path']:
+                v['url'] = f"/static/uploads/{os.path.basename(v['file_path'])}"
+            videos.append(v)
+        return jsonify({'success': True, 'data': videos})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -212,13 +257,13 @@ def admin_dashboard():
 @app.route('/admin/export')
 @login_required
 def admin_export():
-    """تصدير البيانات بصيغة CSV"""
+    """تصدير بيانات المطابخ بصيغة CSV"""
     db = get_db()
     rows = db.execute('SELECT * FROM bookings ORDER BY created_at DESC').fetchall()
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(['كود الحجز', 'اسم الشركة', 'المسؤول', 'الهاتف', 'واتساب', 'البريد', 'المدينة', 'القطاع', 'الباقة', 'السعر', 'الرسالة', 'تاريخ الحجز'])
+    writer.writerow(['كود الحجز', 'اسم الشركة', 'المسؤول', 'الهاتف', 'واتساب', 'البريد', 'المدينة', 'نوع المطبخ', 'الباقة', 'السعر', 'الرسالة', 'تاريخ الحجز'])
     for r in rows:
         writer.writerow([r['id'], r['companyName'], r['contactPerson'], r['phone'], r['whatsapp'], r['email'], r['city'], r['sector'], r['selectedPackage'], r['price'], r['message'], r['date']])
 
@@ -226,8 +271,84 @@ def admin_export():
     return Response(
         csv_bytes,
         mimetype='text/csv; charset=utf-8',
-        headers={'Content-Disposition': f'attachment; filename=expo_masr_bookings_{datetime.now().strftime("%Y%m%d")}.csv'}
+        headers={'Content-Disposition': f'attachment; filename=kitchens_expo_bookings_{datetime.now().strftime("%Y%m%d")}.csv'}
     )
+
+
+@app.route('/admin/videos')
+@login_required
+def admin_videos():
+    db = get_db()
+    rows = db.execute('SELECT * FROM videos ORDER BY sort_order ASC, id DESC').fetchall()
+    videos = [dict(r) for r in rows]
+    return render_template('admin/videos.html', videos=videos)
+
+
+@app.route('/admin/videos/add', methods=['POST'])
+@login_required
+def admin_video_add():
+    title = request.form.get('title', '').strip()
+    video_type = request.form.get('video_type', 'url')
+    url = request.form.get('url', '').strip()
+    sector = request.form.get('sector', '').strip()
+    try:
+        sort_order = int(request.form.get('sort_order', 0))
+    except ValueError:
+        sort_order = 0
+
+    if not title:
+        return redirect(url_for('admin_videos', error='العنوان مطلوب'))
+
+    file_path = ''
+    if video_type == 'upload':
+        if 'file' not in request.files:
+            return redirect(url_for('admin_videos', error='لم يتم رفع أي ملف'))
+        file = request.files['file']
+        if not file.filename:
+            return redirect(url_for('admin_videos', error='لم يتم اختيار ملف'))
+        ext = os.path.splitext(file.filename)[1] or '.mp4'
+        filename = f"video_{datetime.now().strftime('%Y%m%d%H%M%S')}_{os.urandom(4).hex()}{ext}"
+        save_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(save_path)
+        file_path = save_path
+
+    try:
+        db = get_db()
+        db.execute('INSERT INTO videos (title, video_type, url, file_path, sector, sort_order) VALUES (?, ?, ?, ?, ?, ?)',
+                   (title, video_type, url, file_path, sector, sort_order))
+        db.commit()
+    except Exception as e:
+        return redirect(url_for('admin_videos', error=f'خطأ في الحفظ: {str(e)}'))
+
+    return redirect(url_for('admin_videos', success='تمت إضافة الفيديو بنجاح'))
+
+
+@app.route('/admin/videos/delete/<int:video_id>')
+@login_required
+def admin_video_delete(video_id):
+    db = get_db()
+    video = db.execute('SELECT * FROM videos WHERE id = ?', (video_id,)).fetchone()
+    if video:
+        if video['file_path'] and os.path.exists(video['file_path']):
+            try:
+                os.remove(video['file_path'])
+            except OSError:
+                pass
+        db.execute('DELETE FROM videos WHERE id = ?', (video_id,))
+        db.commit()
+    return redirect(url_for('admin_videos'))
+
+
+@app.route('/admin/videos/toggle/<int:video_id>')
+@login_required
+def admin_video_toggle(video_id):
+    db = get_db()
+    video = db.execute('SELECT * FROM videos WHERE id = ?', (video_id,)).fetchone()
+    if video:
+        new_active = 0 if video['active'] else 1
+        db.execute('UPDATE videos SET active = ? WHERE id = ?', (new_active, video_id))
+        db.commit()
+    return redirect(url_for('admin_videos'))
 
 
 @app.route('/api/generate-ticket-pdf', methods=['POST'])
@@ -258,6 +379,10 @@ def generate_ticket_pdf():
         dark_blue = (3/255, 11/255, 26/255)  # #030b1a
         gold = (212/255, 175/255, 55/255)    # #d4af37
         
+        # Choose font: Arabic Arial if registered, fallback to Helvetica
+        font_normal = 'ArabicArial' if _ARIAL_REGISTERED else 'Helvetica'
+        font_bold = 'ArabicArial-Bold' if _ARIAL_REGISTERED else font_normal
+        
         # Draw dark blue background
         c.setFillColor(*dark_blue)
         c.rect(0, 0, pdf_width, pdf_height, fill=1, stroke=0)
@@ -271,12 +396,12 @@ def generate_ticket_pdf():
         c.rect(0.7*cm, 0.7*cm, pdf_width-1.4*cm, pdf_height-1.4*cm)
         
         # Title
-        c.setFont("Helvetica-Bold", 28)
+        c.setFont(font_bold, 28)
         c.setFillColor(*gold)
-        c.drawCentredString(pdf_width/2, pdf_height - 2*cm, "معرض مصر 2026")
+        c.drawCentredString(pdf_width/2, pdf_height - 2*cm, "معرض المطابخ 2026")
         
         # Subtitle
-        c.setFont("Helvetica-Bold", 14)
+        c.setFont(font_bold, 14)
         c.setFillColor(1, 1, 1)
         c.drawCentredString(pdf_width/2, pdf_height - 2.5*cm, "رخصة وتأكيد الجناح")
         
@@ -290,12 +415,12 @@ def generate_ticket_pdf():
         line_height = 0.6*cm
         
         # Company info section
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(font_bold, 11)
         c.setFillColor(*gold)
         c.drawString(1.5*cm, y_position, "بيانات الشركة")
         y_position -= line_height
         
-        c.setFont("Helvetica", 10)
+        c.setFont(font_normal, 10)
         c.setFillColor(1, 1, 1)
         
         # Company name
@@ -312,12 +437,12 @@ def generate_ticket_pdf():
         y_position -= line_height * 1.5
         
         # Package info section
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(font_bold, 11)
         c.setFillColor(*gold)
         c.drawString(1.5*cm, y_position, "تفاصيل الحجز")
         y_position -= line_height
         
-        c.setFont("Helvetica", 10)
+        c.setFont(font_normal, 10)
         c.setFillColor(1, 1, 1)
         
         # Package
@@ -333,12 +458,12 @@ def generate_ticket_pdf():
         y_position -= line_height * 1.5
         
         # Important notes section
-        c.setFont("Helvetica-Bold", 10)
+        c.setFont(font_bold, 10)
         c.setFillColor(*gold)
         c.drawString(1.5*cm, y_position, "ملاحظات مهمة:")
         y_position -= line_height
         
-        c.setFont("Helvetica", 9)
+        c.setFont(font_normal, 9)
         c.setFillColor(1, 1, 1)
         
         notes = [
@@ -353,7 +478,7 @@ def generate_ticket_pdf():
         
         # Footer
         y_position = 1.5*cm
-        c.setFont("Helvetica", 8)
+        c.setFont(font_normal, 8)
         c.setFillColor(0.7, 0.7, 0.7)
         c.drawCentredString(pdf_width/2, y_position, f"تم إنشاء هذه الرخصة في {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         
@@ -364,7 +489,7 @@ def generate_ticket_pdf():
         return Response(
             output.getvalue(),
             mimetype='application/pdf',
-            headers={'Content-Disposition': f'attachment; filename=expo_masr_ticket_{booking_id}.pdf'}
+            headers={'Content-Disposition': f'attachment; filename=expo_kitchens_ticket_{booking_id}.pdf'}
         )
         
     except Exception as e:
@@ -374,7 +499,7 @@ def generate_ticket_pdf():
 @app.route('/admin/export-excel')
 @login_required
 def admin_export_excel():
-    """تصدير البيانات بصيغة Excel احترافية مع تنسيق مميز"""
+    """تصدير بيانات المطابخ بصيغة Excel احترافية مع تنسيق مميز"""
     if not HAS_OPENPYXL:
         return jsonify({'success': False, 'error': 'مكتبة Excel غير مثبتة'}), 500
     
@@ -384,7 +509,7 @@ def admin_export_excel():
     # إنشاء workbook جديد
     wb = Workbook()
     ws = wb.active
-    ws.title = "الحجوزات"
+    ws.title = "حجوزات المطابخ"
     
     # تعيين عرض الأعمدة
     column_widths = [15, 20, 15, 15, 15, 20, 15, 20, 20, 15, 30, 20]
@@ -392,9 +517,9 @@ def admin_export_excel():
         ws.column_dimensions[get_column_letter(i)].width = width
     
     # تنسيق الرأس
-    headers = ['كود الحجز', 'اسم الشركة', 'المسؤول', 'الهاتف', 'واتساب', 'البريد', 'المدينة', 'القطاع', 'الباقة', 'السعر', 'الرسالة', 'تاريخ الحجز']
+    headers = ['كود الحجز', 'اسم الشركة', 'المسؤول', 'الهاتف', 'واتساب', 'البريد', 'المدينة', 'نوع المطبخ', 'الباقة', 'السعر', 'الرسالة', 'تاريخ الحجز']
     
-    # ألوان الذهب والأزرق (ألوان المعرض)
+    # ألوان الذهب والأزرق (ألوان معرض المطابخ)
     gold_fill = PatternFill(start_color='D4AF37', end_color='D4AF37', fill_type='solid')
     gold_font = Font(bold=True, color='030B1A', size=12, name='Calibri')
     border = Border(
@@ -450,7 +575,7 @@ def admin_export_excel():
     return Response(
         output.getvalue(),
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        headers={'Content-Disposition': f'attachment; filename=expo_masr_bookings_{datetime.now().strftime("%Y%m%d")}.xlsx'}
+        headers={'Content-Disposition': f'attachment; filename=kitchens_expo_bookings_{datetime.now().strftime("%Y%m%d")}.xlsx'}
     )
 
 

@@ -198,13 +198,13 @@ export default function InteractiveBooth({
           </div>
         </>
       ) : (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1422] border border-[#d4af37]/25">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-[#0b1422] border border-[#8B5E3C]/25">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-[#d4af37]/10 rounded-xl border border-[#d4af37]/30 text-[#d4af37]">
+            <div className="p-2 bg-[#8B5E3C]/10 rounded-xl border border-[#8B5E3C]/30 text-[#8B5E3C]">
               <Sparkles className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <span className="text-[10px] text-[#d4af37] font-bold block uppercase tracking-wider">مجسم الأجنحة الافتراضية المستقلة</span>
+              <span className="text-[10px] text-[#8B5E3C] font-bold block uppercase tracking-wider">مجسم الأجنحة الافتراضية المستقلة</span>
               <h4 className="text-white text-xs sm:text-sm font-extrabold leading-tight">
                 أنت الآن تتصفح الجناح الرقمي المخصص لـ <span className="text-brand-gold">{currentBooth.companyName}</span>
               </h4>
@@ -212,45 +212,62 @@ export default function InteractiveBooth({
           </div>
           <button
             onClick={onBackToMain}
-            className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-[#d4af37] hover:text-[#030b1a] rounded-xl text-xs font-semibold text-slate-300 transition-all cursor-pointer"
+            className="px-4 py-2 bg-white/5 border border-white/10 hover:bg-[#8B5E3C] hover:text-[#030b1a] rounded-xl text-xs font-semibold text-slate-300 transition-all cursor-pointer"
           >
             ← العودة لجميع العارضين
           </button>
         </div>
       )}
 
-      {/* Main Booth View Frame */}
+      {/* Booth Hero Banner - Immersive Virtual Tour */}
+      <div className="relative h-72 sm:h-96 lg:h-[32rem] -mx-4 sm:-mx-6 lg:-mx-8 -mt-4 sm:-mt-6 lg:-mt-8 mb-6 overflow-hidden rounded-b-3xl shadow-2xl group">
+        {/* Background Image with Parallax effect */}
+        <img 
+          src={currentBooth.bannerUrl} 
+          alt={currentBooth.companyName}
+          className="w-full h-full object-cover brightness-[0.65] group-hover:brightness-[0.8] transition-all duration-500 scale-100 group-hover:scale-105"
+        />
+        
+        {/* 360 Virtual Tour Effect - Animated overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 via-30% to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-to-l from-brand-blue-medium/20 via-transparent to-brand-blue-medium/20"></div>
+        
+        {/* Radial glow effect for depth */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl pointer-events-none"></div>
+        
+        {/* Virtual Tour Badge - Top Right */}
+        <div className="absolute top-4 sm:top-6 lg:top-8 right-4 sm:right-6 lg:right-8 flex flex-col items-end gap-2">
+          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 sm:px-4 py-2 rounded-full border border-brand-gold/40">
+            <Compass className="w-4 h-4 text-brand-gold animate-spin" style={{ animationDuration: '4s' }} />
+            <span className="text-xs sm:text-sm font-bold text-brand-gold">جولة افتراضية 360°</span>
+          </div>
+        </div>
+        
+        {/* Overlay Title - Bottom Section */}
+        <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8 lg:p-12 bg-gradient-to-t from-black/60 via-black/30 via-50% to-transparent flex flex-col justify-end">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
+            <span className="text-[10px] sm:text-xs font-black text-brand-blue-dark bg-brand-gold px-3 py-1 rounded-full flex items-center gap-2 shadow-lg">
+              <Award className="w-3.5 h-3.5 text-brand-blue-dark fill-current" />
+              <span>عارض موثق VIP</span>
+            </span>
+            <span className="text-[10px] sm:text-xs text-white bg-blue-500/80 backdrop-blur px-3 py-1 rounded-full font-bold border border-blue-400/50">
+              جناح رقم {activeSector === 'contracting' ? '12' : activeSector === 'realestate' ? '07' : '23'}
+            </span>
+          </div>
+          <h4 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white drop-shadow-lg">
+            {currentBooth.companyName}
+          </h4>
+          <p className="text-brand-gold-bright text-sm sm:text-lg font-semibold mt-2 drop-shadow-md">
+            {currentBooth.tagline}
+          </p>
+        </div>
+      </div>
+
+      {/* Main Booth Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-brand-blue-dark/50 border border-brand-blue-light/40 rounded-2xl p-4 sm:p-6 overflow-hidden">
         
         {/* RIGHT COLUMN: The Interactive Virtual Booth Canvas (Lg: 8 cols) */}
         <div className="lg:col-span-8 flex flex-col space-y-6">
-          
-          {/* Booth Hero Banner */}
-          <div className="relative h-44 sm:h-56 rounded-xl overflow-hidden shadow-lg border border-brand-blue-light/60">
-            <img 
-              src={currentBooth.bannerUrl} 
-              alt={currentBooth.companyName}
-              className="w-full h-full object-cover brightness-[0.4]"
-            />
-            {/* Overlay Title */}
-            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 bg-gradient-to-t from-black/85 to-transparent flex flex-col justify-end">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] sm:text-xs font-black text-brand-blue-dark bg-brand-gold px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-                  <Award className="w-3 h-3 text-brand-blue-dark fill-current" />
-                  <span>عارض موثق VIP</span>
-                </span>
-                <span className="text-[10px] sm:text-xs text-white bg-blue-500/80 px-2.5 py-0.5 rounded-full font-bold">
-                  جناح رقم {activeSector === 'contracting' ? '12' : activeSector === 'realestate' ? '07' : '23'}
-                </span>
-              </div>
-              <h4 className="text-lg sm:text-2xl font-black text-white">
-                {currentBooth.companyName}
-              </h4>
-              <p className="text-brand-gold-bright text-xs sm:text-sm font-medium mt-1">
-                {currentBooth.tagline}
-              </p>
-            </div>
-          </div>
 
           {/* Booth Sub Navigation Tabs */}
           <div className="flex overflow-x-auto scrollbar-none border-b border-brand-blue-light/80 -mx-2 px-2 sm:mx-0 sm:px-0 whitespace-nowrap gap-1">
@@ -311,20 +328,22 @@ export default function InteractiveBooth({
                     <Video className="w-4 h-4 text-brand-gold" />
                     شاهد الفيديو التعريفي واللقاء الإعلاني للشركة:
                   </h5>
-                  <div className="relative aspect-video rounded-xl overflow-hidden bg-black/60 border border-brand-blue-light">
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10 bg-brand-blue-dark/40">
-                      <div className="w-16 h-16 rounded-full bg-brand-gold text-brand-blue-dark flex items-center justify-center shadow-lg shadow-brand-gold/20 group hover:scale-110 transition-all duration-300 cursor-pointer">
+                  <div className="relative aspect-video rounded-xl overflow-hidden bg-black/60 border border-brand-blue-light group">
+                    <video
+                      src={currentBooth.videoUrl}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/30">
+                      <div className="w-16 h-16 rounded-full bg-brand-gold/80 text-brand-blue-dark flex items-center justify-center shadow-lg shadow-brand-gold/20">
                         <Video className="w-8 h-8 text-brand-blue-dark fill-current" />
                       </div>
                       <span className="text-xs sm:text-sm text-white font-bold mt-3">تشغيل الفيديو الترويجي الرسمي للمؤسسة</span>
-                      <span className="text-[10px] text-slate-400">فيديو تعريفي عالي الدقة يعرض المصنع والمشاريع القائمة</span>
+                      <span className="text-[10px] text-slate-300">فيديو تعريفي عالي الدقة يعرض المصنع والمشاريع القائمة</span>
                     </div>
-                    {/* Placeholder image for mock premium feel */}
-                    <img 
-                      src={currentBooth.gallery[2]} 
-                      alt="مقطع الفيديو" 
-                      className="w-full h-full object-cover brightness-[0.25]"
-                    />
                   </div>
                 </div>
               </div>

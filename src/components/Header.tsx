@@ -74,14 +74,14 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
             </div>
             <div className="flex flex-col min-w-0">
               <div className="flex items-center gap-1 xs:gap-1.5 flex-wrap">
-                <span className="text-[7px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">إكسبو مصر 2026</span>
+                <span className="text-[7px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">معرض المطابخ 2026</span>
                 <span className="text-[7px] xs:text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   نشط الآن
                 </span>
               </div>
               <h1 className="text-[10px] xs:text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight leading-tight mt-0.5 min-w-0 truncate">
-                إكسبو مصر <span className="text-brand-gold font-bold">للبناء والعقارات</span>
+                معرض <span className="text-brand-gold font-bold">المطابخ الحديثة</span>
               </h1>
               <p className="text-[7px] xs:text-[10px] text-brand-gold/80 font-mono tracking-wider font-semibold mt-px">expomasr.online</p>
             </div>
@@ -102,7 +102,7 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
                   key={item.href}
                   href={item.href}
                   onClick={(e) => scrollToSection(e, item.href)}
-                  className="px-3 py-1.5 text-xs font-semibold text-white/70 hover:text-[#d4af37] transition-colors duration-200 hover:bg-white/5 rounded-full border border-transparent hover:border-white/5"
+                  className="px-3 py-1.5 text-xs font-semibold text-white/70 hover:text-[#8B5E3C] transition-colors duration-200 hover:bg-white/5 rounded-full border border-transparent hover:border-white/5"
                 >
                   {item.label}
                 </a>
@@ -123,16 +123,16 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
             ) : (
               <>
                 {/* Bento date badge on desktop */}
-                <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#d4af37]/20">
+                <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#8B5E3C]/20">
                   <span className="text-[9px] text-white/60 uppercase">الموعد القادم للضخ</span>
-                  <span className="text-xs font-bold text-[#d4af37]">سبتمبر 2026</span>
+                  <span className="text-xs font-bold text-[#8B5E3C]">سبتمبر 2026</span>
                 </div>
 
                 <a
                   id="header-cta-button"
                   href="#register-section"
                   onClick={(e) => scrollToSection(e, '#register-section')}
-                  className="hidden md:inline-flex items-center bg-white text-[#030b1a] px-6 py-2.5 rounded-full font-bold text-xs hover:bg-[#d4af37] transition-all duration-300 shadow-md shadow-white/5 cursor-pointer"
+                  className="hidden md:inline-flex items-center bg-white text-[#030b1a] px-6 py-2.5 rounded-full font-bold text-xs hover:bg-[#8B5E3C] transition-all duration-300 shadow-md shadow-white/5 cursor-pointer"
                 >
                   <span>احجز جناحك الآن</span>
                 </a>

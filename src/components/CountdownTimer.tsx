@@ -45,7 +45,7 @@ export default function CountdownTimer() {
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl xs:rounded-3xl bg-[#d4af37] text-[#030b1a] p-4 xs:p-6 md:p-8 shadow-2xl max-w-3xl mx-auto border border-white/20">
+    <div className="relative overflow-hidden rounded-2xl xs:rounded-3xl bg-[#8B5E3C] text-[#030b1a] p-4 xs:p-6 md:p-8 shadow-2xl max-w-3xl mx-auto border border-white/20">
       {/* Visual background pattern */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -73,9 +73,9 @@ export default function CountdownTimer() {
               >
                 <div className="relative w-11 h-11 xs:w-16 xs:h-16 sm:w-20 sm:h-20 bg-[#030b1a] border border-white/10 rounded-xl xs:rounded-2xl flex items-center justify-center shadow-lg overflow-hidden group">
                   {/* Glowing line indicators */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#d4af37]"></div>
+                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#8B5E3C]"></div>
                   
-                  <span className="text-lg xs:text-2xl sm:text-3xl md:text-4xl font-extrabold font-mono text-[#d4af37] tracking-wider leading-none">
+                  <span className="text-lg xs:text-2xl sm:text-3xl md:text-4xl font-extrabold font-mono text-[#8B5E3C] tracking-wider leading-none">
                     {String(unit.value).padStart(2, '0')}
                   </span>
                 </div>

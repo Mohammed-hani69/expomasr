@@ -7,11 +7,11 @@
   --font-tajawal: "Tajawal", "Cairo", sans-serif;
   
   --color-brand-blue-dark: #030b1a;
-  --color-brand-blue-medium: rgba(255, 255, 255, 0.05);
-  --color-brand-blue-light: rgba(255, 255, 255, 0.1);
-  --color-brand-gold: #D4AF37;
-  --color-brand-gold-dark: #aa8a2e;
-  --color-brand-gold-bright: #F5D061;
+  --color-brand-blue-medium: rgba(255, 255, 255, 0.08);
+  --color-brand-blue-light: rgba(255, 255, 255, 0.15);
+  --color-brand-gold: #8B5E3C;
+  --color-brand-gold-dark: #6B3F1F;
+  --color-brand-gold-bright: #C49A6C;
 }
 
 /* Custom scrollbar for premium touch */
@@ -26,7 +26,7 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37;
+  background: #8B5E3C;
 }
 
 html,
@@ -52,15 +52,15 @@ body {
 }
 
 .bento-card:hover {
-  border-color: rgba(212, 175, 55, 0.25);
+  border-color: rgba(139, 94, 60, 0.25);
   transform: translateY(-2px);
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
 }
 
 .bento-card-highlight {
-  background: #D4AF37;
+  background: #8B5E3C;
   border-radius: 1.5rem; /* rounded-3xl */
   color: #030b1a;
-  box-shadow: 0 10px 30px -10px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(139, 94, 60, 0.3);
 }
 

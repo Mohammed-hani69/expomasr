@@ -3,7 +3,7 @@ import { SECTORS, PACKAGES } from '../data';
 import { RegistrationForm } from '../types';
 import { sendBookingToFlask } from '../utils/googleSheets';
 // @ts-ignore
-import formBg from '../assets/images/booking_form_bg_1781534095031.jpg';
+import formBg from '../assets/images/WhatsApp-Image-2025-09-28-at-11.59F.png';
 import { 
   Building2, 
   User, 
@@ -289,18 +289,18 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
             style={{ backgroundImage: `url(${formBg})` }}
           />
           {/* Subtle warm glow underlay */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B5E3C]/5 rounded-full blur-3xl pointer-events-none z-0"></div>
           
           <div className="text-center mb-8 relative z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-gold/10 border border-brand-gold/20 rounded-full text-brand-gold text-xs font-semibold mb-3">
               <Sparkles className="w-4 h-4 text-brand-gold animate-spin" />
-              <span>تسجيل فوري مشفّر وآمن لعام 2026</span>
+              <span>نموذج حجز آمن وموثّق — بياناتك مشفّرة</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-              احجز مساحتك الرقمية وجناحك الافتراضي الآن
+              انضم إلى نخبة العارضين وابدأ جني الأرباح
             </h3>
             <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-2xl mx-auto">
-              املأ البيانات المعمارية والمهنية المطلوبة بدقة، وسيتراجعها مهندسو الدعم الفني لدينا لبناء جناحك الرقمي وإطلاق الحملات الممولة لعلامتك فوراً.
+              املأ بياناتك بدقة — سيتولى فريق الدعم الفني لدينا بناء جناحك الرقمي وإطلاق الحملات الإعلانية المموّلة لعلامتك التجارية فور التأكيد.
             </p>
           </div>
 
@@ -312,7 +312,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
               <div id="form-group-companyName">
                 <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
                   <Building2 className="w-4 h-4 text-brand-gold" />
-                  اسم الشركة الرسمي والمهني:
+                  اسم الشركة (الاسم التجاري الرسمي):
                 </label>
                 <input 
                   type="text"
@@ -588,8 +588,8 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                     المقعد محجوز بدفعة معلّقة
                   </span>
 
-                  <span className="text-[10px] text-[#d4af37] bg-[#d4af37]/10 border border-[#d4af37]/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2 font-bold block w-fit">
-                    <CheckCircle className="w-3 h-3 text-[#d4af37]" />
+                  <span className="text-[10px] text-[#8B5E3C] bg-[#8B5E3C]/10 border border-[#8B5E3C]/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2 font-bold block w-fit">
+                    <CheckCircle className="w-3 h-3 text-[#8B5E3C]" />
                     تم حفظ البيانات في قاعدة البيانات بنجاح
                   </span>
                 </div>
