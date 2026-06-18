@@ -29,6 +29,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'booth'>('home');
   const [selectedBoothId, setSelectedBoothId] = useState<'contracting' | 'realestate' | 'decor'>('contracting');
   const [videos, setVideos] = useState<any[]>([]);
+  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetch('/api/videos')
@@ -36,6 +37,10 @@ export default function App() {
       .then(d => { if (d.success) setVideos(d.data); })
       .catch(() => {});
   }, []);
+
+  const handleVideoError = (id: string) => {
+    setVideoErrors(prev => ({ ...prev, [id]: true }));
+  };
 
   useEffect(() => {
     if (showSplash) {
@@ -478,17 +483,33 @@ export default function App() {
             ) : (
               videos.map((v) => (
                 <div key={v.id} className="group relative aspect-[9/16] rounded-2xl overflow-hidden border border-white/10 hover:border-[#8B5E3C]/40 transition-all duration-300 shadow-lg bg-black/40">
-                  <video
-                    src={v.url}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                  />
+                  {videoErrors[v.id] ? (
+                    <img
+                      src="/assets/images/Ultra-Modern-Kitchen_01.jpg"
+                      alt={v.title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={v.url}
+                      className="w-full h-full object-cover"
+                      poster="/assets/images/Ultra-Modern-Kitchen_01.jpg"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="auto"
+                      onError={() => handleVideoError(v.id)}
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                   <div className="absolute bottom-0 right-0 left-0 p-3">
                     <span className="text-[10px] sm:text-xs font-bold text-white">{v.title}</span>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-14 h-14 rounded-full bg-[#8B5E3C]/80 flex items-center justify-center backdrop-blur-sm">
+                      <span className="text-white text-2xl">▶</span>
+                    </div>
                   </div>
                 </div>
               ))
