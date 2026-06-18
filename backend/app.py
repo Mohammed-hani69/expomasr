@@ -44,6 +44,9 @@ DB_PATH = os.path.join(os.path.dirname(__file__), 'kitchens_bookings.db')
 UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+FRONTEND_FOLDER = os.path.join(os.path.dirname(__file__), 'frontend')
+os.makedirs(FRONTEND_FOLDER, exist_ok=True)
+
 # Admin credentials (change in production via env vars)
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'kitchens2026')
@@ -577,6 +580,21 @@ def admin_export_excel():
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         headers={'Content-Disposition': f'attachment; filename=kitchens_expo_bookings_{datetime.now().strftime("%Y%m%d")}.xlsx'}
     )
+
+
+# ─── Serve built frontend for production ──────────────────────
+from flask import send_from_directory
+
+@app.route('/')
+def serve_frontend_index():
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
+
+@app.route('/<path:path>')
+def serve_frontend(path):
+    full = os.path.join(FRONTEND_FOLDER, path)
+    if os.path.isfile(full):
+        return send_from_directory(FRONTEND_FOLDER, path)
+    return send_from_directory(FRONTEND_FOLDER, 'index.html')
 
 
 if __name__ == '__main__':
