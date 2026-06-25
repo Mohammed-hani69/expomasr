@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ShieldCheck, Flame, Award } from 'lucide-react';
+import { motion } from 'motion/react';
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -8,135 +7,110 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [progress, setProgress] = useState(0);
-  const [loadingText, setLoadingText] = useState('جاري بدء تشغيل المعرض...');
+  const [phase, setPhase] = useState(0);
 
   useEffect(() => {
-    // Elegant progressing texts in Arabic
-    const textIntervals = [
-      { percentage: 15, text: 'جاري تحميل الأجنحة الرقمية للمطابخ...' },
-      { percentage: 40, text: 'تكامل بروتوكول قواعد بيانات Google Sheets...' },
-      { percentage: 65, text: 'تحميل العناصر التفاعلية والصور...' },
-      { percentage: 85, text: 'تهيئة قاعات العرض وتأمين الخوادم...' },
-      { percentage: 100, text: 'أهلاً بك في معرض المطابخ الحديثة 2026 ✨' }
-    ];
-
     const timer = setInterval(() => {
-      setProgress((prevProgress) => {
-        const nextProgress = prevProgress + Math.floor(Math.random() * 4) + 2;
-        
-        // Find matching text based on current percentage
-        const matchingText = textIntervals.find(item => nextProgress <= item.percentage);
-        if (matchingText) {
-          setLoadingText(matchingText.text);
-        }
-
-        if (nextProgress >= 100) {
+      setProgress(prev => {
+        const next = prev + Math.floor(Math.random() * 5) + 2;
+        if (next >= 30 && phase === 0) setPhase(1);
+        if (next >= 65 && phase === 1) setPhase(2);
+        if (next >= 100) {
           clearInterval(timer);
-          setTimeout(() => {
-            onComplete();
-          }, 600); // Small delay to let user enjoy the 100% complete state
+          setTimeout(onComplete, 500);
           return 100;
         }
-        return nextProgress;
+        return next;
       });
-    }, 45);
-
+    }, 50);
     return () => clearInterval(timer);
-  }, [onComplete]);
+  }, [phase, onComplete]);
 
   return (
-    <div id="splash-screen" className="fixed inset-0 z-[9999] bg-[#030b1a] flex flex-col items-center justify-center overflow-hidden select-none">
-      
-      {/* Absolute Ambient Glow FX */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#8B5E3C]/10 rounded-full blur-[120px]" />
-        <div className="absolute bottom-1/4 left-1/3 -translate-x-1/2 w-[350px] h-[350px] bg-sky-500/5 rounded-full blur-[100px]" />
-        
-        {/* Animated Blueprint Background Pattern */}
-        <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#8B5E3C_1px,transparent_1px),linear-gradient(to_bottom,#8B5E3C_1px,transparent_1px)] bg-[size:40px_40px]" />
-      </div>
+    <div className="fixed inset-0 z-[9999] bg-[#030b1a] flex flex-col items-center justify-center overflow-hidden select-none">
 
-      {/* Floating Sparkles inside splash */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[20%] left-[15%] text-[#8B5E3C]/30 animate-pulse">
-          <Sparkles className="w-5 h-5" />
-        </div>
-        <div className="absolute top-[35%] right-[20%] text-[#8B5E3C]/20 animate-bounce">
-          <Award className="w-6 h-6" />
-        </div>
-        <div className="absolute bottom-[25%] left-[25%] text-[#8B5E3C]/20">
-          <ShieldCheck className="w-5 h-5 animate-pulse" />
-        </div>
-        <div className="absolute bottom-[30%] right-[15%] text-[#8B5E3C]/30">
-          <Flame className="w-4 h-4 animate-bounce" />
-        </div>
-      </div>
+      {/* Gold radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(196,154,108,0.06) 0%, transparent 70%)' }}
+      />
 
-      {/* main Container */}
-      <div className="relative text-center max-w-md px-6 flex flex-col items-center">
-        
-        {/* Animated Logo Container with Golden Pulse Rings */}
-        <div className="relative mb-8">
-          {/* Pulsing Outer Radiance */}
-          <div className="absolute -inset-4 bg-gradient-to-r from-[#8B5E3C] to-amber-500 rounded-[35px] blur-xl opacity-30 animate-pulse" />
-          
-          {/* Rotating borders */}
-          <div className="absolute -inset-1.5 bg-gradient-to-tr from-[#8B5E3C] via-transparent to-[#8B5E3C] rounded-[32px] animate-spin" style={{ animationDuration: '6s' }} />
+      {/* Grid overlay */}
+      <div className="absolute inset-0 opacity-[0.02]"
+        style={{ backgroundImage: 'linear-gradient(to right, #C49A6C 1px, transparent 1px), linear-gradient(to bottom, #C49A6C 1px, transparent 1px)', backgroundSize: '50px 50px' }}
+      />
 
-          {/* Core EM Logo container */}
-          <div className="relative w-28 h-28 bg-[#040e24] rounded-[30px] border-2 border-[#8B5E3C] flex flex-col items-center justify-center shadow-2xl">
-            <span className="text-[#8B5E3C] font-serif text-5xl font-black italic tracking-wider leading-none select-none">
-              EM
-            </span>
-            <div className="absolute bottom-3 text-[8px] tracking-[0.25em] text-slate-400 font-bold uppercase mr-[-0.25em]">
-              Expo Masr
+      <div className="relative text-center max-w-sm px-6 flex flex-col items-center">
+
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-5"
+        >
+          <div className="relative">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden border border-[#C49A6C]/25 shadow-2xl shadow-black/50 bg-[#040e24] flex items-center justify-center">
+              <img src="/assets/images/logo.png" alt="اكسبو مصر" className="w-full h-full object-contain p-2.5" />
             </div>
-          </div>
-        </div>
-
-        {/* Title & Brand Slogan */}
-        <div className="space-y-2 mb-12">
-          <h1 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-l from-white via-slate-100 to-amber-200 tracking-tight">
-            معرض المطابخ الحديثة 2026
-          </h1>
-          <p className="text-xs sm:text-sm text-[#8B5E3C] font-medium tracking-wide">
-            المنصة الافتراضية والمعرض الرقمي الأكبر بمصر والخليج
-          </p>
-        </div>
-
-        {/* Customized Progress Bar Panel */}
-        <div className="w-72 sm:w-80 bg-brand-blue-dark/50 backdrop-blur rounded-2xl p-4 border border-[#8B5E3C]/15 shadow-2xl relative">
-          
-          {/* Progress Percent Counter */}
-          <div className="flex items-center justify-between mb-2 text-xs font-bold font-mono">
-            <span className="text-[#8B5E3C]">{progress}%</span>
-            <span className="text-slate-400 font-sans">تجهيز الفعاليات</span>
-          </div>
-
-          {/* Outer bar */}
-          <div className="h-2 w-full bg-[#05142e] rounded-full overflow-hidden border border-white/5 relative">
-            <div 
-              className="h-full rounded-full bg-gradient-to-r from-[#8B5E3C] via-amber-500 to-[#8B5E3C] transition-all duration-150 ease-out shadow-[0_0_12px_rgba(212,175,55,0.4)]"
-              style={{ width: `${progress}%` }}
+            <motion.div
+              className="absolute -inset-2 rounded-3xl border border-[#C49A6C]/10"
+              animate={{ opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             />
           </div>
+        </motion.div>
 
-          {/* Dynamic Loaded Description Texts with fade-in-out */}
-          <div className="mt-3.5 h-4 flex items-center justify-center">
-            <p className="text-[10px] sm:text-xs text-slate-400 font-medium animate-pulse text-center">
-              {loadingText}
-            </p>
+        {/* Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="space-y-1 mb-10"
+        >
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+            اكسبو مصر
+          </h1>
+          <p className="text-xs text-[#C49A6C]/60 font-medium">
+            المنصة الرقمية الأولى لتسويق المطابخ الفاخرة
+          </p>
+        </motion.div>
+
+        {/* Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="w-56 sm:w-64"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold text-[#C49A6C] font-mono">{progress}%</span>
+            <span className="text-[10px] text-slate-600 font-medium">تجهيز المنصة</span>
           </div>
-        </div>
-
-        {/* Bottom micro-copy */}
-        <div className="absolute bottom-[-150px] whitespace-nowrap text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold select-none flex items-center gap-2">
-          <span>Virtual Digital Presence</span>
-          <span className="text-[#8B5E3C]">•</span>
-          <span>Next-Gen Architecture</span>
-        </div>
+          <div className="h-[3px] w-full bg-white/[0.04] rounded-full overflow-hidden">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ width: `${progress}%`, background: 'linear-gradient(to left, #C49A6C, #8B5E3C)' }}
+              transition={{ duration: 0.1 }}
+            />
+          </div>
+          <p className="text-[9px] text-slate-700 mt-3 text-center">
+            {phase === 0 && 'جاري تحميل الأجنحة الرقمية...'}
+            {phase === 1 && 'تجهيز الحملات التسويقية...'}
+            {phase === 2 && 'تهيئة منصة التواصل مع العملاء...'}
+          </p>
+        </motion.div>
 
       </div>
+
+      {/* Bottom line */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7, duration: 0.6 }}
+        className="absolute bottom-8 text-[7px] tracking-[0.35em] text-slate-700 font-bold select-none"
+      >
+        WWW.EXPOMASR.ONLINE
+      </motion.div>
     </div>
   );
 }

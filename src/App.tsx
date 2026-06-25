@@ -1,159 +1,386 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as Icons from 'lucide-react';
-import { SECTORS, DIGITAL_BOOTHS } from './data';
-// @ts-ignore
-import heroBg from './assets/images/Ultra-Modern-Kitchen_01.jpg';
-// @ts-ignore
-import skylineBg from './assets/images/مطابخ-مودرن.webp';
-// @ts-ignore
-import blueprintBg from './assets/images/استبدل-مطابخ-الوميتال-ب-مطابخ-حديثة-2025-1024x768.webp';
+import React, { useState, useEffect } from 'react';
+import { DIGITAL_BOOTHS, PACKAGES } from './data';
 
-// Import our custom responsive components
 import Header from './components/Header';
-import CountdownTimer from './components/CountdownTimer';
 import InteractiveBooth from './components/InteractiveBooth';
-import LeadDashboard from './components/LeadDashboard';
-import PriceCalculator from './components/PriceCalculator';
 import RegistrationSection from './components/RegistrationSection';
-import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
 import SplashScreen from './components/SplashScreen';
 import { AnimatePresence, motion } from 'motion/react';
+import {
+  ShieldCheck, ArrowRight, Play, Star, TrendingUp,
+  DollarSign, Target, Clock, Smartphone, BarChart3,
+  Eye, Users, Building2, CheckCircle, ChevronLeft,
+  Crown, Gem, LayoutList, Medal, Phone, MessageCircle,
+  Image, Layers, Sparkles, Zap
+} from 'lucide-react';
 
-// Review rating icons helper
-import { Star, ShieldCheck, Flame, Users, Calendar, TrendingUp, CheckCircle, ArrowLeft, ArrowUpRight, Award, Zap, HelpCircle, ArrowRight, Sparkles, LayoutGrid, Share2 } from 'lucide-react';
+const PACKAGE_IMAGES: Record<string, string> = {
+  basic: '/assets/images/مطابخ-مودرن-صغيرة.webp',
+  professional: '/assets/images/مطابخ-مودرن.webp',
+  premium: '/assets/images/Ultra-Modern-Kitchen_01.jpg',
+  sponsor: '/assets/images/cairo_expo_bg_1781526370175.jpg',
+};
+
+const PACKAGE_BOOTHS: Record<string, ('contracting' | 'realestate' | 'decor')[]> = {
+  basic: ['contracting'],
+  professional: ['contracting', 'realestate'],
+  premium: ['contracting', 'realestate', 'decor'],
+  sponsor: ['contracting', 'realestate', 'decor'],
+};
+
+const problems = [
+  {
+    icon: DollarSign,
+    title: 'تكاليف المشاركة في المعارض التقليدية مرتفعة جداً؟',
+    desc: 'وفر حتى 90% من ميزانية المعارض التقليدية. جناحك الرقمي يعمل 24 ساعة طوال أيام العام — بتكلفة رمزية لا تُضاهى.',
+    color: 'text-emerald-600',
+    bg: 'bg-emerald-50',
+  },
+  {
+    icon: Target,
+    title: 'لا تصل للعميل المستهدف بدقة؟',
+    desc: 'حملاتنا الإعلانية المدعومة بالذكاء الاصطناعي تستهدف بدقة متناهية الباحثين الجادين عن مطابخ فاخرة في مصر والسعودية والإمارات.',
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+  },
+  {
+    icon: Eye,
+    title: 'منتجاتك لا تظهر بشكل احترافي؟',
+    desc: 'جناح افتراضي تفاعلي يعرض منتجاتك وصور مشاريعك وفيديوهاتك بجودة سينمائية فائقة تأسر انتباه الزوار وتحقق انطباعاً لا يُنسى.',
+    color: 'text-amber-600',
+    bg: 'bg-amber-50',
+  },
+  {
+    icon: Clock,
+    title: 'لا يتوفر لديك وقت لمتابعة العملاء؟',
+    desc: 'نظام آلي متكامل يجمع لك بيانات كل عميل استفسر عن خدماتك — الاسم، رقم الهاتف، الاهتمامات — وتصلك مباشرة على واتساب.',
+    color: 'text-purple-600',
+    bg: 'bg-purple-50',
+  },
+  {
+    icon: TrendingUp,
+    title: 'تريد التفوق على منافسيك في السوق؟',
+    desc: 'ظهور علامتك التجارية بجوار كبرى شركات المطابخ في المنطقة يمنحك مصداقية فورية وثقة هائلة في السوق.',
+    color: 'text-rose-600',
+    bg: 'bg-rose-50',
+  },
+  {
+    icon: BarChart3,
+    title: 'لا تعرف العائد الفعلي على استثمارك؟',
+    desc: 'لوحة تحليلية احترافية ترصد بدقة عدد المشاهدات، الاستفسارات، الصفقات المغلقة — تعرف بدقة عائد استثمارك الحقيقي.',
+    color: 'text-indigo-600',
+    bg: 'bg-indigo-50',
+  },
+];
+
+const steps = [
+  {
+    num: '١', icon: Building2,
+    title: 'اختر باقتك واحجز جناحك',
+    desc: 'تصفح الباقات المتاحة واختر الأنسب لشركتك. املأ نموذج الحجز — فريقنا يؤكد اشتراكك ويبدأ التجهيز الفوري خلال 24 ساعة.',
+  },
+  {
+    num: '٢', icon: Smartphone,
+    title: 'نسلم ملفاتك ونصمم الجناح',
+    desc: 'نستلم شعار شركتك، صور المطابخ المنفذة، والفيديوهات الترويجية. نصمم لك جناحاً رقمياً يعبر عن هوية علامتك التجارية.',
+  },
+  {
+    num: '٣', icon: Target,
+    title: 'الحملات التسويقية تنطلق',
+    desc: 'نطلق حملات إعلانية ممولة على جوجل وفيسبوك تستهدف بدقة الباحثين عن مطابخ فاخرة في مصر والخليج.',
+  },
+  {
+    num: '٤', icon: Users,
+    title: 'العملاء المستهدفون يتوافدون',
+    desc: 'استقبل استفسارات، طلبات تصميم، ورسائل واتساب مباشرة من عملاء جادين — دون أي مجهود إضافي من فريقك.',
+  },
+  {
+    num: '٥', icon: BarChart3,
+    title: 'التقرير التحليلي الختامي',
+    desc: 'نرسل لك تقريراً شاملاً بقاعدة بيانات العملاء المهتمين، إحصائيات الزيارات، والمبيعات المحققة.',
+  },
+];
+
+type BoothKey = 'contracting' | 'realestate' | 'decor';
+
+function PackageBoothsBasic({ boothKeys, openBooth }: { boothKeys: BoothKey[]; openBooth: (k: BoothKey) => void }) {
+  return (
+    <div className="space-y-3">
+      {boothKeys.map((key) => {
+        const b = DIGITAL_BOOTHS[key];
+        if (!b) return null;
+        return (
+          <button
+            key={key}
+            onClick={() => openBooth(key)}
+            className="w-full group flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-300 hover:shadow-sm transition-all cursor-pointer text-right"
+          >
+            <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100">
+              <img src={b.bannerUrl} alt={b.companyName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-slate-900 text-sm truncate">{b.companyName}</h4>
+                <span className="text-[10px] text-slate-400 shrink-0">| {b.tagline}</span>
+              </div>
+              <p className="text-xs text-slate-500 mt-1 line-clamp-1">{b.about}</p>
+              <div className="flex items-center gap-3 mt-2 text-[10px] text-slate-400">
+                <span className="flex items-center gap-1"><Image className="w-3 h-3" />{b.gallery.length} صورة</span>
+                <span className="flex items-center gap-1"><MessageCircle className="w-3 h-3" />واتساب</span>
+              </div>
+            </div>
+            <ChevronLeft className="w-5 h-5 text-slate-300 group-hover:text-[#8B5E3C] group-hover:-translate-x-1 transition-all shrink-0" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function PackageBoothsProfessional({ boothKeys, openBooth }: { boothKeys: BoothKey[]; openBooth: (k: BoothKey) => void }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {boothKeys.map((key) => {
+        const b = DIGITAL_BOOTHS[key];
+        if (!b) return null;
+        return (
+          <div key={key} className="group bg-white border-2 border-amber-100 rounded-2xl overflow-hidden hover:border-[#8B5E3C]/30 hover:-translate-y-1 transition-all duration-300 shadow-sm hover:shadow-lg">
+            <div className="h-40 overflow-hidden relative">
+              <img src={b.bannerUrl} alt={b.companyName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+              <div className="absolute bottom-3 right-3 flex gap-1.5">
+                <span className="bg-white/90 backdrop-blur-sm text-[#8B5E3C] text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1">
+                  <Medal className="w-3 h-3" /> {key === 'contracting' ? 'مقاولات' : key === 'realestate' ? 'تطوير عقاري' : 'ديكور'}
+                </span>
+                <span className="bg-[#8B5E3C] text-white text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-current" /> {b.projects.length} مشاريع
+                </span>
+              </div>
+            </div>
+            <div className="p-5">
+              <h3 className="font-black text-slate-900 text-sm">{b.companyName}</h3>
+              <p className="text-[#8B5E3C] text-xs font-bold mt-0.5">{b.tagline}</p>
+              <div className="flex flex-wrap gap-1.5 mt-3">
+                <span className="text-[10px] bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full">صور وفيديو</span>
+                <span className="text-[10px] bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full">واتساب مباشر</span>
+                <span className="text-[10px] bg-amber-50 text-amber-700 font-semibold px-2 py-0.5 rounded-full">كتالوج</span>
+              </div>
+              <p className="text-slate-500 text-xs mt-3 line-clamp-2 leading-relaxed">{b.about}</p>
+              <button
+                onClick={() => openBooth(key)}
+                className="w-full mt-4 py-2.5 rounded-xl bg-gradient-to-l from-[#8B5E3C] to-[#a0704a] text-white font-bold text-xs hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm"
+              >
+                <span>دخول الجناح</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PackageBoothsPremium({ boothKeys, openBooth }: { boothKeys: BoothKey[]; openBooth: (k: BoothKey) => void }) {
+  const [featured, ...rest] = boothKeys;
+  return (
+    <div className="space-y-6">
+      {featured && (() => {
+        const b = DIGITAL_BOOTHS[featured];
+        if (!b) return null;
+        return (
+          <div
+            onClick={() => openBooth(featured)}
+            className="group relative h-72 sm:h-80 rounded-2xl overflow-hidden cursor-pointer border border-slate-200 hover:border-[#8B5E3C]/40 transition-all"
+          >
+            <img src={b.bannerUrl} alt={b.companyName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+            <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-8">
+              <span className="inline-flex items-center gap-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/20 mb-3">
+                <Gem className="w-3 h-3" /> جناح مميز
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white">{b.companyName}</h3>
+              <p className="text-white/80 text-xs sm:text-sm font-medium mt-1">{b.tagline}</p>
+              <p className="text-white/60 text-xs mt-2 max-w-lg line-clamp-2">{b.about}</p>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-white/70 text-xs flex items-center gap-1"><Image className="w-3.5 h-3.5" />{b.gallery.length} معرض</span>
+                <span className="text-white/70 text-xs flex items-center gap-1"><Layers className="w-3.5 h-3.5" />{b.projects.length} مشروع</span>
+              </div>
+              <div className="mt-4 inline-flex items-center gap-2 px-5 py-2 bg-white text-slate-900 rounded-xl font-bold text-xs hover:bg-amber-50 transition-all">
+                <span>دخول الجناح</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      {rest.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {rest.map((key) => {
+            const b = DIGITAL_BOOTHS[key];
+            if (!b) return null;
+            return (
+              <button
+                key={key}
+                onClick={() => openBooth(key)}
+                className="group flex items-center gap-4 bg-white border border-slate-200 rounded-xl p-4 hover:border-[#8B5E3C]/30 hover:-translate-y-0.5 transition-all cursor-pointer text-right"
+              >
+                <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100">
+                  <img src={b.bannerUrl} alt={b.companyName} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0 text-right">
+                  <h4 className="font-bold text-slate-900 text-xs truncate">{b.companyName}</h4>
+                  <p className="text-[10px] text-slate-500 truncate">{b.tagline}</p>
+                  <span className="text-[10px] font-bold text-[#8B5E3C] flex items-center gap-1 mt-1">
+                    <span>دخول</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PackageBoothsSponsor({ boothKeys, openBooth }: { boothKeys: BoothKey[]; openBooth: (k: BoothKey) => void }) {
+  return (
+    <div className="space-y-5">
+      {boothKeys.map((key) => {
+        const b = DIGITAL_BOOTHS[key];
+        if (!b) return null;
+        return (
+          <div
+            key={key}
+            onClick={() => openBooth(key)}
+            className="group relative h-56 sm:h-64 rounded-2xl overflow-hidden cursor-pointer border-2 border-[#C49A6C]/30 hover:border-[#C49A6C]/60 transition-all"
+          >
+            <img src={b.bannerUrl} alt={b.companyName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+            <div className="absolute top-4 left-4">
+              <span className="inline-flex items-center gap-1.5 bg-gradient-to-l from-[#C49A6C] to-[#8B5E3C] text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg">
+                <Crown className="w-3 h-3" />
+                <span>راعي رسمي</span>
+              </span>
+            </div>
+            <div className="absolute bottom-0 right-0 left-0 p-6 sm:p-8">
+              <div className="flex items-center gap-3 mb-2">
+                <h3 className="text-lg sm:text-2xl font-black text-white">{b.companyName}</h3>
+                <span className="hidden sm:inline-flex items-center gap-1 bg-white/10 backdrop-blur-md text-white/80 text-[10px] font-bold px-2 py-1 rounded-full border border-white/10">
+                  <Zap className="w-3 h-3" /> شريك معتمد
+                </span>
+              </div>
+              <p className="text-[#C49A6C] text-xs sm:text-sm font-bold">{b.tagline}</p>
+              <p className="text-white/60 text-xs mt-1 max-w-xl line-clamp-1">{b.about}</p>
+              <div className="flex items-center gap-4 mt-3">
+                <span className="text-white/60 text-[10px] flex items-center gap-1"><Phone className="w-3 h-3" />{b.phoneNumber}</span>
+                <span className="text-white/60 text-[10px] flex items-center gap-1"><MessageCircle className="w-3 h-3" />{b.whatsappNumber}</span>
+              </div>
+              <div className="mt-3 inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-l from-[#C49A6C] to-[#8B5E3C] text-white rounded-xl font-bold text-xs hover:opacity-90 transition-all shadow-lg shadow-black/20">
+                <span>دخول الجناح</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PackageHeaderIcon({ pkgId }: { pkgId: string }) {
+  if (pkgId === 'basic') return <LayoutList className="w-4 h-4" />;
+  if (pkgId === 'professional') return <Medal className="w-4 h-4" />;
+  if (pkgId === 'premium') return <Gem className="w-4 h-4" />;
+  if (pkgId === 'sponsor') return <Crown className="w-4 h-4" />;
+  return null;
+}
+
+const PACKAGE_VISUALS: Record<string, { icon: React.ElementType; accent: string; lightBg: string; border: string; label: string }> = {
+  basic: { icon: LayoutList, accent: 'text-slate-600', lightBg: 'bg-slate-50', border: 'border-slate-200', label: 'باقة اقتصادية' },
+  professional: { icon: Medal, accent: 'text-amber-700', lightBg: 'bg-amber-50', border: 'border-amber-200', label: 'الأكثر مبيعاً' },
+  premium: { icon: Gem, accent: 'text-indigo-600', lightBg: 'bg-indigo-50', border: 'border-indigo-200', label: 'باقة مميزة' },
+  sponsor: { icon: Crown, accent: 'text-[#C49A6C]', lightBg: 'bg-[#C49A6C]/10', border: 'border-[#C49A6C]/30', label: 'الراعي الرسمي' },
+};
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState<boolean>(true);
-  const [selectedPkgId, setSelectedPkgId] = useState<string>('professional');
-  const [currentView, setCurrentView] = useState<'home' | 'booth'>('home');
-  const [selectedBoothId, setSelectedBoothId] = useState<'contracting' | 'realestate' | 'decor'>('contracting');
-  const [videos, setVideos] = useState<any[]>([]);
-  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
+  const [showSplash, setShowSplash] = useState(true);
+  const [selectedPkgId, setSelectedPkgId] = useState('professional');
+  const [currentView, setCurrentView] = useState<'home' | 'package' | 'booth'>('home');
+  const [selectedBoothId, setSelectedBoothId] = useState<BoothKey>('contracting');
+  const [lastPackageId, setLastPackageId] = useState<string | null>(null);
+  const [videoIndex, setVideoIndex] = useState(0);
+
+  const heroVideos = [
+    '/static/uploads/24e6ee8415fedc165da58b9d89e5f2ba_720w.mp4',
+    '/static/uploads/94ab7b320c4fef6b838063a9047e4996_720w.mp4',
+    '/static/uploads/5b852614aea2bf37ad4b64487218254b_720w.mp4',
+  ];
 
   useEffect(() => {
-    fetch('/api/videos')
-      .then(r => r.json())
-      .then(d => { if (d.success) setVideos(d.data); })
-      .catch(() => {});
+    const interval = setInterval(() => {
+      setVideoIndex(i => (i + 1) % heroVideos.length);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleVideoError = (id: string) => {
-    setVideoErrors(prev => ({ ...prev, [id]: true }));
-  };
-
   useEffect(() => {
-    if (showSplash) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (showSplash) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
   }, [showSplash]);
 
-  const handleSelectPackage = (packageId: string) => {
-    setSelectedPkgId(packageId);
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 85;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
+  const openPackage = (pkgId: string) => {
+    setSelectedPkgId(pkgId);
+    setCurrentView('package');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Why Participate details with premium descriptions
-  const advantages = [
-    {
-      title: "وصول فوري لآلاف العملاء",
-      description: "نستقطب لك آلاف الباحثين الجادين عن المطابخ العصرية والفاخرة عبر حملات إعلانية ممولة بدقة، لتكون شركتك أمام جمهور يشتري ولا يتفرج فقط.",
-      icon: "Zap",
-    },
-    {
-      title: "جناح رقمي فاخر 3D",
-      description: "صفحة شركة احترافية بتقنية العرض ثلاثي الأبعاد تعرض أحدث تصاميم مطابخك وصور وفيديوهات عالية الجودة، تترك انطباعاً لا يُنسى لدى الزوار.",
-      icon: "Building2",
-    },
-    {
-      title: "معرض صور وفيديوهات تفاعلي",
-      description: "مساحة غير محدودة لرفع صور المطابخ المنفذة وألبومات الألوان والخامات والفيديوهات الترويجية، مع تجربة تصفح سينمائية تأسر انتباه العملاء.",
-      icon: "Briefcase",
-    },
-    {
-      title: "نظام استعلامات وطلبات مباشرة",
-      description: "يمكن للعميل ملء طلب تصميم أو الاستفسار عن الأسعار بنقرة واحدة، وتصل بياناته فوراً إلى بريدك وواتساب بدون وسيط — تغلق الصفقة في ثوانٍ.",
-      icon: "Layers",
-    },
-    {
-      title: "تواصل فوري عبر واتساب",
-      description: "زر واتساب مباشر في جناحك يسمح للعميل بالدردشة الحية معك، وإرسال صور المقترحات والمقايسات الفنية دون مغادرة المنصة.",
-      icon: "MessageSquare",
-    },
-    {
-      title: "تعزيز الهوية والعلامة التجارية",
-      description: "ظهور اسم وشعار شركتك بجوار كبرى العلامات التجارية في المعرض يمنحك ثقة ومصداقية فورية في السوق المصري والخليجي.",
-      icon: "Award",
-    },
-    {
-      title: "ملفات بيانات العملاء الحقيقية",
-      description: "تحصل على تقارير بأسماء وأرقام هواتف واهتمامات كل زائر استفسر عن خدماتك، لتتمكن من متابعتهم وتسويق منتجاتك بعد انتهاء المعرض.",
-      icon: "Download",
-    },
-    {
-      title: "تحليلات وعائد استثمار مضمون",
-      description: "لوحة تحليلية رقمية ترصد عدد المشاهدات والاستفسارات والصفقات التي تحققت — وتعطيك صورة واضحة عن العائد الاستثماري لمشاركتك.",
-      icon: "BarChart3",
-    }
-  ];
+  const backToHome = () => {
+    setCurrentView('home');
+    setTimeout(() => scrollTo('booth-showcase'), 100);
+  };
 
-  // How it works steps
-  const steps = [
-    {
-      num: "١",
-      title: "اختر باقتك واحجز مقعدك",
-      description: "حدد الباقة المناسبة لشركتك (أساسية، احترافية، أو راعي رسمي) واملأ نموذج الحجز الآمن — سنؤكد اشتراكك خلال 24 ساعة."
-    },
-    {
-      num: "٢",
-      title: "نسلّم ملفاتك ونجهز الجناح",
-      description: "فريق الدعم الفني لدينا يتسلم شعار شركتك وصور المطابخ والفيديوهات والكتالوجات، ويصمم لك جناحاً رقمياً احترافياً بنفس هويتك."
-    },
-    {
-      num: "٣",
-      title: "حملاتنا الإعلانية تنطلق",
-      description: "نطلق حملات ممولة على فيسبوك وجوجل ومنصات التواصل تستهدف بدقة الباحثين عن مطابخ فاخرة في مصر والخليج."
-    },
-    {
-      num: "٤",
-      title: "استقبال العملاء والاستفسارات",
-      description: "يتوافد إليك آلاف الزوار المؤهلين، وتستقبل استفسارات مباشرة ونقرات واتساب وطلبات تصميم دون أي مجهود منك."
-    },
-    {
-      num: "٥",
-      title: "التقرير الختامي والبيانات",
-      description: "بعد انتهاء المعرض، نرسل لك تقريراً شاملاً بقاعدة بيانات العملاء وإحصائيات الزيارات والمبيعات لتحليل العائد الاستثماري."
-    }
-  ];
+  const openBooth = (boothKey: BoothKey) => {
+    setLastPackageId(selectedPkgId);
+    setSelectedBoothId(boothKey);
+    setCurrentView('booth');
+    window.scrollTo({ top: 0 });
+  };
 
-  // Anticipated stats for kitchen expo
-  const expectedStats = [
-    { value: "+٥,٠٠٠", label: "زائر مستهدف مؤهل", desc: "باحثون نشطون يخططون لشراء مطابخ جديدة لمنازلهم ومشاريعهم خلال 2026" },
-    { value: "+٥٠", label: "شركة ورائد أعمال", desc: "نخبة من كبرى مصنعي وموزعي المطابخ والأجهزة المنزلية في مصر والخليج" },
-    { value: "+٣٠٠", label: "فرصة بيع وتعاقد", desc: "استفسارات جادة ونقرات واتساب وطلبات تصميم — معظمها يتحول إلى عقود تنفيذ" },
-    { value: "+١٠٠", label: "مشروع منجز", desc: "صفقات متوقعة الإغلاق فوراً من اليوم الأول للحملات المدعومة والضغط الإعلاني" }
-  ];
+  const backToPackage = () => {
+    const pkgId = lastPackageId || selectedPkgId;
+    setSelectedPkgId(pkgId);
+    setCurrentView('package');
+    window.scrollTo({ top: 0 });
+  };
+
+  const selectedPackage = PACKAGES.find(p => p.id === selectedPkgId);
+  const packageBoothKeys = PACKAGE_BOOTHS[selectedPkgId] || [];
+  const visual = PACKAGE_VISUALS[selectedPkgId];
+
+  const renderPackageBooths = () => {
+    switch (selectedPkgId) {
+      case 'basic':
+        return <PackageBoothsBasic boothKeys={packageBoothKeys} openBooth={openBooth} />;
+      case 'professional':
+        return <PackageBoothsProfessional boothKeys={packageBoothKeys} openBooth={openBooth} />;
+      case 'premium':
+        return <PackageBoothsPremium boothKeys={packageBoothKeys} openBooth={openBooth} />;
+      case 'sponsor':
+        return <PackageBoothsSponsor boothKeys={packageBoothKeys} openBooth={openBooth} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
@@ -170,814 +397,309 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen bg-[#030b1a] text-slate-100 overflow-hidden font-sans">
-      
-      {/* Visual Ambient Light Spots */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-[#8B5E3C]/10 rounded-full blur-[160px] pointer-events-none"></div>
-        <div className="absolute top-[1200px] left-1/4 w-[500px] h-[500px] bg-white/5 rounded-full blur-[180px] pointer-events-none"></div>
-        <div className="absolute bottom-[800px] right-10 w-[450px] h-[450px] bg-[#8B5E3C]/5 rounded-full blur-[150px] pointer-events-none"></div>
-      </div>
-
-      {/* STICKY HEADER */}
-      <Header 
-        currentView={currentView} 
-        onBack={() => {
-          setCurrentView('home');
-          setTimeout(() => {
-            const el = document.getElementById('booth-showcase');
-            if (el) {
-              const offset = 85;
-              const bodyRect = document.body.getBoundingClientRect().top;
-              const elementRect = el.getBoundingClientRect().top;
-              const elementPosition = elementRect - bodyRect;
-              const offsetPosition = elementPosition - offset;
-              window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-            }
-          }, 100);
-        }} 
-        companyName={currentView === 'booth' ? DIGITAL_BOOTHS[selectedBoothId]?.companyName : undefined} 
-      />
-
-      {currentView === 'booth' ? (
-        /* ISOLATED COMPONENT VIEWER / PRIVATE BOOTH PAGE */
-        <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-[85vh]">
-          {/* Back trace option */}
-          <div className="mb-6">
-            <button
-              onClick={() => {
-                setCurrentView('home');
-                setTimeout(() => {
-                  const el = document.getElementById('booth-showcase');
-                  if (el) {
-                    const offset = 85;
-                    const bodyRect = document.body.getBoundingClientRect().top;
-                    const elementRect = el.getBoundingClientRect().top;
-                    const elementPosition = elementRect - bodyRect;
-                    const offsetPosition = elementPosition - offset;
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                  }
-                }, 100);
-              }}
-              className="text-[#8B5E3C] text-xs sm:text-sm font-bold flex items-center gap-1.5 hover:underline cursor-pointer bg-transparent border-none outline-none"
-            >
-              <ArrowRight className="w-4 h-4" />
-              <span>العودة لساحة المعرض والأجنحة الرئيسية</span>
-            </button>
-          </div>
-
-          <InteractiveBooth 
-            initialSector={selectedBoothId} 
-            isStandalonePage={true} 
-            onBackToMain={() => {
-              setCurrentView('home');
-              setTimeout(() => {
-                const el = document.getElementById('booth-showcase');
-                if (el) {
-                  const offset = 85;
-                  const bodyRect = document.body.getBoundingClientRect().top;
-                  const elementRect = el.getBoundingClientRect().top;
-                  const elementPosition = elementRect - bodyRect;
-                  const offsetPosition = elementPosition - offset;
-                  window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                }
-              }, 100);
-            }}
-          />
-        </div>
-      ) : (
-        <>
-          {/* HERO SECTION */}
-          <section id="hero" className="relative pt-32 sm:pt-40 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-brand-blue-dark">
-        {/* Background Video loop with robust background-image fallback for any server/connection conditions */}
-        <div 
-          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-60 mix-blend-lighten"
-          style={{ backgroundImage: `url(${heroBg})` }}
-        >
-          <video
-            src="https://assets.mixkit.co/videos/preview/mixkit-modern-building-with-curved-lines-and-glass-facades-44158-large.mp4"
-            poster={heroBg}
-            className="w-full h-full object-cover"
-            autoPlay
-            loop
-            muted
-            playsInline
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto text-center space-y-8 relative z-10">
-          
-          {/* Tag Line */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#8B5E3C]/10 border border-[#8B5E3C]/20 rounded-full text-[#8B5E3C] text-xs sm:text-sm font-bold tracking-wide animate-pulse">
-            <Flame className="w-4 h-4 text-[#8B5E3C] fill-current" />
-            <span>المنصة الرقمية الأولى لترويج المطابخ في مصر — موثقة ومعتمدة رسمياً</span>
-          </div>
-
-          {/* Main Display Heading */}
-          <div className="space-y-4 max-w-4xl mx-auto px-1 xs:px-0">
-            <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-tight">
-              المنصة الرقمية الأكبر <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-l from-brand-gold via-brand-gold-bright to-brand-gold">
-                لتسويق المطابخ الفاخرة
-              </span> في مصر والشرق الأوسط 2026
-            </h1>
-            
-            <div className="max-w-3xl mx-auto bg-slate-950/80 backdrop-blur-md border border-brand-gold/30 rounded-2xl p-4 xs:p-6 shadow-2xl shadow-black/80 mt-6">
-              <p className="text-white text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed font-semibold">
-                انضم إلى نخبة من كبرى شركات المطابخ والمطاعم والأجهزة المنزلية واعرض منتجاتك أمام أكثر من 5,000 عميل ومستثمر حقيقي يبحث عن التميز. منصتنا معتمدة وموثقة، وتضمن لك ظهوراً احترافياً يعزز مصداقيتك ويزيد مبيعاتك.
-              </p>
-            </div>
-          </div>
-
-          {/* Call-to-actions buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto pt-2">
-            <a
-              id="hero-book-button"
-              href="#register-section"
-              onClick={(e) => scrollToSection(e, '#register-section')}
-              className="w-full sm:w-auto px-8 py-4 bg-[#8B5E3C] text-[#030b1a] rounded-xl font-bold text-base shadow-lg shadow-[#8B5E3C]/25 hover:shadow-brand-gold/30 hover:-translate-y-0.5 transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShieldCheck className="w-5 h-5 text-[#030b1a]" />
-              <span>احجز جناح شركتك الآن</span>
-            </a>
-
-            <a
-              id="hero-prices-button"
-              href="#pricing"
-              onClick={(e) => scrollToSection(e, '#pricing')}
-              className="w-full sm:w-auto border border-white/20 px-8 py-4 rounded-xl font-bold text-base hover:bg-white/5 transition-all text-center cursor-pointer"
-            >
-              <span>طلب عروض الأسعار والباقات</span>
-            </a>
-          </div>
-
-          {/* COUNTDOWN WIDGET */}
-          <div className="pt-4">
-            <CountdownTimer />
-          </div>
-
-          {/* Quick Statistic highlight Cards (Bento Style) */}
-          <div className="pt-12">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-              
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-xl relative overflow-hidden text-center group hover:border-[#8B5E3C]/50 transition-all duration-300">
-                <div className="font-mono text-3xl sm:text-4xl font-extrabold text-[#8B5E3C] leading-none">٥٠٠٠+</div>
-                <div className="text-white text-xs sm:text-sm font-bold mt-2">مشتري وزائر مؤهل</div>
-                <p className="text-[10px] sm:text-xs text-white/50 mt-1 lines-2">باحثون جادون عن أفضل المطابخ والعروض</p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-xl relative overflow-hidden text-center group hover:border-[#8B5E3C]/50 transition-all duration-300">
-                <div className="font-mono text-3xl sm:text-4xl font-extrabold text-[#8B5E3C] leading-none">٥٠+</div>
-                <div className="text-white text-xs sm:text-sm font-bold mt-2">عارض ورائد أعمال</div>
-                <p className="text-[10px] sm:text-xs text-white/50 mt-1 lines-2">أبرز مصنعي وموردي المطابخ في مصر والخليج</p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-xl relative overflow-hidden text-center group hover:border-[#8B5E3C]/50 transition-all duration-300">
-                <div className="font-mono text-3xl sm:text-4xl font-extrabold text-[#8B5E3C] leading-none">٣٠٠+</div>
-                <div className="text-white text-xs sm:text-sm font-bold mt-2">صفقة متوقعة</div>
-                <p className="text-[10px] sm:text-xs text-white/50 mt-1 lines-2">عملاء مستعدون للتعاقد الفوري وطلب المقايسات</p>
-              </div>
-
-              <div className="bg-white/5 border border-white/10 p-6 rounded-3xl shadow-xl relative overflow-hidden text-center group hover:border-[#8B5E3C]/50 transition-all duration-300">
-                <div className="font-mono text-3xl sm:text-4xl font-extrabold text-[#8B5E3C] leading-none">٢</div>
-                <div className="text-white text-xs sm:text-sm font-bold mt-2">أيام ترويج مكثف</div>
-                <p className="text-[10px] sm:text-xs text-white/50 mt-1 lines-2">حملات إعلانية موجّهة بلا توقف ولا منافسة تقليدية</p>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* WHY US? - ADVANTAGES SECTION */}
-      <section id="why-us" className="py-20 border-y border-white/5 relative bg-[#030b1a] overflow-hidden">
-        {/* Background Skyline Image with low opacity & majestic blending */}
-        <div 
-          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-35 mix-blend-screen"
-          style={{ backgroundImage: `url(${skylineBg})` }}
+      <div className="min-h-screen bg-white text-slate-800 overflow-hidden">
+        <Header
+          currentView={currentView === 'booth' ? 'booth' : 'home'}
+          onBack={currentView === 'booth' ? backToPackage : backToHome}
+          companyName={currentView === 'booth' ? DIGITAL_BOOTHS[selectedBoothId]?.companyName : undefined}
         />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20 font-mono">
-              عروض قيمة لا تُفوّت
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
-              لماذا تثق بكبرى شركات المطابخ في منصتنا؟
-            </h2>
-            <p className="text-white/75 text-xs sm:text-sm mt-2 leading-relaxed">
-              وفر ميزانيتك التسويقية وضاعف أرباحك. منصتنا صممت خصيصاً لتحويل المشاهدين إلى عملاء حقيقيين — بجناح افتراضي يفوق جودة المعارض التقليدية، وحملاتنا الإعلانية المضمونة تجلب لك المستثمر الجاد دون مجهود إضافي.
-            </p>
-          </div>
 
-          {/* Grid layout of 8 Advantages */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {advantages.map((adv, idx) => {
-              const IconComponent = (Icons as any)[adv.icon] || Icons.HelpCircle;
-              return (
-                <div
-                  id={`adv-card-${idx}`}
-                  key={idx}
-                  className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:border-[#8B5E3C]/30 hover:-translate-y-1 transition-all duration-300 group shadow-lg"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#8B5E3C] mb-4 group-hover:bg-[#8B5E3C] group-hover:text-[#030b1a] transition-all shadow-md">
-                    <IconComponent className="w-5 h-5" />
-                  </div>
-                  
-                  <h4 className="text-sm sm:text-base font-extrabold text-white group-hover:text-[#8B5E3C] transition-colors">
-                    {adv.title}
-                  </h4>
-                  
-                  <p className="text-xs text-white/50 mt-2 leading-relaxed text-justify">
-                    {adv.description}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
+        {currentView === 'package' ? (
+          <div className={`pt-28 pb-20 px-4 sm:px-6 lg:px-8 min-h-[85vh] ${visual?.lightBg}`}>
+            <div className="max-w-6xl mx-auto">
+              <button
+                onClick={backToHome}
+                className="text-slate-500 text-xs sm:text-sm font-bold flex items-center gap-1.5 hover:text-[#8B5E3C] transition-colors mb-6 group"
+              >
+                <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                <span>العودة للباقات</span>
+              </button>
 
-        </div>
-      </section>
-
-      {/* HOW IT WORKS SECTION */}
-      <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-[#030b1a]">
-        <div className="max-w-7xl mx-auto">
-          
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20">
-              5 خطوات فقط نحو النجاح
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-              كيف نضمن لك عائداً استثمارياً حقيقياً؟
-            </h2>
-            <p className="text-white/70 text-xs sm:text-sm mt-2">
-              عمليتنا مصممة لتوصيل منتجك إلى العميل المناسب في الوقت المناسب — بخطوات واضحة ونتائج قابلة للقياس تضمن لك أقصى عائد استثماري.
-            </p>
-          </div>
-
-          {/* Circle steps outline timeline line */}
-          <div className="relative">
-            {/* Visual connector line for large screens */}
-            <div className="hidden lg:block absolute top-[60px] left-[10%] right-[10%] h-0.5 bg-gradient-to-r from-white/5 via-[#8B5E3C]/30 to-white/5 -z-10"></div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-              {steps.map((step, idx) => (
-                <div 
-                  id={`step-card-${idx}`}
-                  key={idx} 
-                  className="flex flex-col items-center text-center space-y-4 bg-white/5 border border-white/10 p-6 rounded-3xl lg:bg-white/5 lg:border lg:border-white/10 lg:p-6 transition-all duration-300 hover:border-[#8B5E3C]/30"
-                >
-                  
-                  {/* Circle number */}
-                  <div className="w-14 h-14 rounded-full bg-white/5 border border-[#8B5E3C]/20 flex items-center justify-center font-black text-lg text-[#8B5E3C] shadow-lg relative transition-all">
-                    {/* Top active glowing light */}
-                    <div className="absolute -top-1 w-2 h-2 rounded-full bg-[#8B5E3C]"></div>
-                    <span className="font-mono tracking-widest">{step.num}</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <h4 className="text-sm sm:text-base font-extrabold text-white">
-                      {step.title}
-                    </h4>
-                    <p className="text-xs text-white/50 leading-relaxed max-w-xs mx-auto">
-                      {step.description}
-                    </p>
-                  </div>
-
-                </div>
-              ))}
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* PARTICIPATING SECTORS */}
-      <section id="sectors" className="py-20 bg-[#030b1a] relative border-t border-white/5 overflow-hidden">
-        {/* Background Blueprint draft image pattern */}
-        <div 
-          className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-25 mix-blend-color-dodge"
-          style={{ backgroundImage: `url(${blueprintBg})` }}
-        />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20">
-              المطابخ الحديثة والمتطورة
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
-              رحلة الأناقة: معرض المطابخ الفاخرة
-            </h2>
-            <p className="text-white/70 text-xs sm:text-sm mt-2">
-              اكتشف أرقى تصاميم المطابخ العصرية والكلاسيكية التي تجمع بين الفخامة والذكاء — اختر ما يناسب ذوقك الرفيع:
-            </p>
-          </div>
-
-          {/* Videos Grid - Vertical Videos from API */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-            {videos.length === 0 ? (
-              Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="aspect-[9/16] rounded-2xl bg-white/5 animate-pulse border border-white/5" />
-              ))
-            ) : (
-              videos.map((v) => (
-                <div key={v.id} className="group relative aspect-[9/16] rounded-2xl overflow-hidden border border-white/10 hover:border-[#8B5E3C]/40 transition-all duration-300 shadow-lg bg-black/40">
-                  {videoErrors[v.id] ? (
-                    <img
-                      src="/assets/images/Ultra-Modern-Kitchen_01.jpg"
-                      alt={v.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <video
-                      src={v.url}
-                      className="w-full h-full object-cover"
-                      poster="/assets/images/Ultra-Modern-Kitchen_01.jpg"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="auto"
-                      onError={() => handleVideoError(v.id)}
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                  <div className="absolute bottom-0 right-0 left-0 p-3">
-                    <span className="text-[10px] sm:text-xs font-bold text-white">{v.title}</span>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-14 h-14 rounded-full bg-[#8B5E3C]/80 flex items-center justify-center backdrop-blur-sm">
-                      <span className="text-white text-2xl">▶</span>
+              {selectedPackage && visual && (
+                <>
+                  <div className={`flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 pb-8 border-b ${visual.border}`}>
+                    <div>
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${visual.accent} ${visual.lightBg} px-3 py-1 rounded-full`}>
+                        <PackageHeaderIcon pkgId={selectedPkgId} />
+                        {visual.label}
+                      </span>
+                      <h1 className={`text-2xl sm:text-4xl font-black mt-3 ${selectedPkgId === 'sponsor' ? 'text-[#8B5E3C]' : 'text-slate-900'}`}>
+                        {selectedPackage.name}
+                      </h1>
+                      <p className={`text-xs sm:text-sm font-bold mt-1 ${visual.accent}`}>{selectedPackage.badge}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {selectedPackage.features.slice(0, 3).map((f, i) => (
+                          <span key={i} className="text-[10px] bg-white border border-slate-200 text-slate-600 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3 text-emerald-500" />
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <div className={`text-3xl sm:text-4xl font-black ${visual.accent}`}>{selectedPackage.price.toLocaleString()} ج.م</div>
+                      <div className="text-xs text-slate-400 font-medium">{selectedPackage.period}</div>
                     </div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
 
-          {/* Sector labels below videos */}
-          {videos.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-2 mt-8">
-            {[...new Set(videos.filter((v: any) => v.sector).map((v: any) => v.sector))].map((sector) => (
-              <span
-                key={sector as string}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full text-[10px] sm:text-xs text-white/70 hover:text-[#8B5E3C] hover:border-[#8B5E3C]/30 transition-all"
-              >
-                {sector as string}
-              </span>
-            ))}
-          </div>
-          )}
-
-        </div>
-      </section>
-
-      {/* 3 COMPANIES VIRTUAL SHOWCASE - COVER IMAGES */}
-      <section id="booth-showcase" className="py-20 bg-[#020813] border-y border-white/5 relative overflow-hidden">
-        {/* subtle styling dots */}
-        <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#8B5E3C]/5 rounded-full blur-[120px] pointer-events-none"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20 font-mono">
-              الأجنحة الرقـمية لعمالقة التشـييد والعقارات
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
-              استكشف الأجنحة الافتراضية المستقلة
-            </h2>
-            <p className="text-white/70 text-xs sm:text-sm mt-3 leading-relaxed">
-              اختر إحدى المؤسسات العقارية والمعمارية الرائدة للدخول مباشرة إلى جناحها المميز بشكل منفصل وتجربة واجهة العرض التفاعلية الكاملة.
-            </p>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
-            {/* Card 1: Contracting */}
-            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#8B5E3C]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
-              {/* Cover Image */}
-              <div className="h-48 relative overflow-hidden shrink-0">
-                <img 
-                  src={DIGITAL_BOOTHS.contracting.bannerUrl} 
-                  alt={DIGITAL_BOOTHS.contracting.companyName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.8]"
-                />
-                <span className="absolute top-4 right-4 bg-yellow-500/90 text-slate-900 text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
-                  المقاولات والخرسانات
-                </span>
-                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
-                  جناح VIP 12
-                </span>
-              </div>
-              {/* Content body */}
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
-                  {DIGITAL_BOOTHS.contracting.companyName}
-                </h3>
-                <p className="text-brand-gold text-xs font-bold mt-1.5">
-                  {DIGITAL_BOOTHS.contracting.tagline}
-                </p>
-                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
-                  {DIGITAL_BOOTHS.contracting.about}
-                </p>
-                {/* Visual mini status indicators */}
-                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>فيديو تعريفي 4K</span>
+                  <div className="mb-6">
+                    <h2 className="font-black text-slate-900 text-sm flex items-center gap-2">
+                      <Building2 className={`w-4 h-4 ${visual.accent}`} />
+                      <span>الأجنحة المشتركة في هذه الباقة ({packageBoothKeys.length})</span>
+                    </h2>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>أسئلة فنية تفاعلية</span>
-                  </div>
-                </div>
 
-                {/* Social Sharing Section */}
-                <div className="flex items-center justify-between border-t border-[#8B5E3C]/10 pt-3.5 pb-2 mb-4">
-                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
-                    <span>مشاركة الجناح:</span>
-                  </span>
-                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
-                    {/* WhatsApp */}
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                        `استكشف جناح ${DIGITAL_BOOTHS.contracting.companyName} المميز في معرض المطابخ الحديثة 2026 - تجربة تفاعلية!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر واتساب"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
-                      </svg>
-                    </a>
-                    {/* Facebook */}
-                    <a
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر فيسبوك"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
-                      </svg>
-                    </a>
-                    {/* LinkedIn */}
-                    <a
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر لينكد إن"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
+                  {renderPackageBooths()}
 
-                {/* Click action */}
-                <button
-                  onClick={() => {
-                    setSelectedBoothId('contracting');
-                    setCurrentView('booth');
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                  }}
-                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <span>دخول الجناح الافتراضي</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
-              </div>
+                  {packageBoothKeys.length === 0 && (
+                    <div className="text-center py-20 text-slate-400">
+                      <Building2 className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                      <p className="font-bold text-sm">لا توجد أجنحة متاحة في هذه الباقة حالياً</p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-
-            {/* Card 2: Real Estate */}
-            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#8B5E3C]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
-              {/* Cover Image */}
-              <div className="h-48 relative overflow-hidden shrink-0">
-                <img 
-                  src={DIGITAL_BOOTHS.realestate.bannerUrl} 
-                  alt={DIGITAL_BOOTHS.realestate.companyName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.8]"
+          </div>
+        ) : currentView === 'booth' ? (
+          <div className="pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-[85vh]">
+            <button
+              onClick={backToPackage}
+              className="text-[#8B5E3C] text-xs sm:text-sm font-bold flex items-center gap-1.5 hover:underline mb-6 group"
+            >
+              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <span>العودة للباقة</span>
+            </button>
+            <InteractiveBooth
+              initialSector={selectedBoothId}
+              isStandalonePage
+              onBackToMain={backToPackage}
+              packageId={lastPackageId || selectedPkgId}
+            />
+          </div>
+        ) : (
+          <>
+            {/* HERO */}
+            <section className="relative min-h-[90vh] flex items-center justify-center pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+              {heroVideos.map((src, i) => (
+                <video
+                  key={src}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${i === videoIndex ? 'opacity-100' : 'opacity-0'}`}
+                  src={src}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
                 />
-                <span className="absolute top-4 right-4 bg-emerald-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
-                  التطوير والاستثمار العقاري
-                </span>
-                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
-                  جناح VIP 07
-                </span>
-              </div>
-              {/* Content body */}
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
-                  {DIGITAL_BOOTHS.realestate.companyName}
-                </h3>
-                <p className="text-brand-gold text-xs font-bold mt-1.5">
-                  {DIGITAL_BOOTHS.realestate.tagline}
-                </p>
-                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
-                  {DIGITAL_BOOTHS.realestate.about}
-                </p>
-                {/* Visual mini status indicators */}
-                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>نظم سداد مرنة</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>حساب أرباح استثمارية</span>
-                  </div>
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70"></div>
+              <div className="max-w-5xl mx-auto text-center relative z-10">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-white/90 text-xs font-bold mb-6 border border-white/20">
+                  <Star className="w-3.5 h-3.5 fill-current text-[#C49A6C]" />
+                  <span>أكبر منصة رقمية لعرض وتسويق المطابخ الفاخرة في الشرق الأوسط — اكسبو مصر 2026</span>
                 </div>
-
-                {/* Social Sharing Section */}
-                <div className="flex items-center justify-between border-t border-[#8B5E3C]/10 pt-3.5 pb-2 mb-4">
-                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
-                    <span>مشاركة الجناح:</span>
+                <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-tight mb-6 drop-shadow-lg">
+                  المنصة المتخصصة التي تجمع
+                  <br />
+                  <span className="text-[#C49A6C]">نخبة شركات المطابخ تحت سقف رقمي واحد</span>
+                </h1>
+                <p className="text-white/80 text-sm sm:text-lg max-w-3xl mx-auto mb-6 leading-relaxed drop-shadow">
+                  نوفر لعلامتك التجارية جناحاً افتراضياً احترافياً، وحملات تسويقية مدفوعة تستهدف العملاء الأكثر اهتماماً، 
+                  وصولاً مباشراً إلى <strong className="text-white">آلاف المشترين الجادين</strong> — 
+                  نساعد شركاءنا على زيادة المبيعات وتعزيز حضورهم في السوق.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
+                  <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full border border-white/20">
+                    <CheckCircle className="w-3 h-3 text-emerald-400" /> آلاف الزوار المستهدفين شهرياً
                   </span>
-                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
-                    {/* WhatsApp */}
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                        `استكشف جناح ${DIGITAL_BOOTHS.realestate.companyName} المميز في معرض المطابخ الحديثة 2026 - تجربة تفاعلية!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر واتساب"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
-                      </svg>
-                    </a>
-                    {/* Facebook */}
-                    <a
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر فيسبوك"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
-                      </svg>
-                    </a>
-                    {/* LinkedIn */}
-                    <a
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر لينكد إن"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Click action */}
-                <button
-                  onClick={() => {
-                    setSelectedBoothId('realestate');
-                    setCurrentView('booth');
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                  }}
-                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <span>دخول الجناح الافتراضي</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Card 3: Interior Decor */}
-            <div className="bg-[#040e20] border border-white/5 rounded-3xl overflow-hidden flex flex-col hover:border-[#8B5E3C]/40 hover:-translate-y-1.5 transition-all duration-300 shadow-2xl group">
-              {/* Cover Image */}
-              <div className="h-48 relative overflow-hidden shrink-0">
-                <img 
-                  src={DIGITAL_BOOTHS.decor.bannerUrl} 
-                  alt={DIGITAL_BOOTHS.decor.companyName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-[0.8]"
-                />
-                <span className="absolute top-4 right-4 bg-purple-500/90 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-md">
-                  الديكور واللاندسكيب
-                </span>
-                <span className="absolute top-4 left-4 bg-black/60 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
-                  جناح VIP 23
-                </span>
-              </div>
-              {/* Content body */}
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-base sm:text-lg font-black text-white group-hover:text-brand-gold transition-colors duration-200">
-                  {DIGITAL_BOOTHS.decor.companyName}
-                </h3>
-                <p className="text-brand-gold text-xs font-bold mt-1.5">
-                  {DIGITAL_BOOTHS.decor.tagline}
-                </p>
-                <p className="text-slate-300 text-xs sm:text-sm mt-3 line-clamp-3 text-justify leading-relaxed flex-grow">
-                  {DIGITAL_BOOTHS.decor.about}
-                </p>
-                {/* Visual mini status indicators */}
-                <div className="grid grid-cols-2 gap-2 my-5 pt-4 border-t border-white/5 text-[11px] text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>تشطيبات نيو كلاسيك</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-brand-gold" />
-                    <span>معرض صور 4K</span>
-                  </div>
-                </div>
-
-                {/* Social Sharing Section */}
-                <div className="flex items-center justify-between border-t border-[#8B5E3C]/10 pt-3.5 pb-2 mb-4">
-                  <span className="text-[10px] xs:text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                    <Share2 className="w-3.5 h-3.5 text-brand-gold/80" />
-                    <span>مشاركة الجناح:</span>
+                  <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full border border-white/20">
+                    <CheckCircle className="w-3 h-3 text-emerald-400" /> عملاء جادون وطلبات تسعير حقيقية
                   </span>
-                  <div className="flex items-center gap-2 bg-[#06152a] px-2.5 py-1 rounded-xl border border-white/5 shadow-inner">
-                    {/* WhatsApp */}
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                        `استكشف جناح ${DIGITAL_BOOTHS.decor.companyName} المميز في معرض المطابخ الحديثة 2026 - تجربة تفاعلية!\n👇 تفضل بالزيارة:\nhttps://expomasr.online/`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-emerald-500/20 text-emerald-400 hover:text-emerald-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر واتساب"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.73-1.464L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.625 1.451 5.436 0 9.86-4.417 9.863-9.848.001-2.63-1.023-5.101-2.885-6.963C16.388 1.981 13.911.96 11.278.96 5.845.96 1.42 5.378 1.416 10.809c-.001 1.637.426 3.237 1.237 4.646L1.65 21.658l6.326-1.658-.329.154z" />
-                      </svg>
-                    </a>
-                    {/* Facebook */}
-                    <a
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-blue-600/20 text-blue-400 hover:text-blue-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر فيسبوك"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
-                      </svg>
-                    </a>
-                    {/* LinkedIn */}
-                    <a
-                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                        'https://expomasr.online/'
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-sky-600/20 text-sky-400 hover:text-sky-300 active:scale-90 transition-all cursor-pointer"
-                      title="مشاركة عبر لينكد إن"
-                    >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
-                      </svg>
-                    </a>
-                  </div>
+                  <span className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full border border-white/20">
+                    <CheckCircle className="w-3 h-3 text-emerald-400" /> انتشار واسع في مصر والخليج
+                  </span>
                 </div>
-
-                {/* Click action */}
-                <button
-                  onClick={() => {
-                    setSelectedBoothId('decor');
-                    setCurrentView('booth');
-                    window.scrollTo({ top: 0, behavior: 'instant' });
-                  }}
-                  className="w-full py-3 rounded-xl bg-white/5 border border-white/10 hover:border-brand-gold hover:bg-brand-gold hover:text-[#030b1a] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
-                >
-                  <span>دخول الجناح الافتراضي</span>
-                  <ArrowUpRight className="w-4 h-4" />
-                </button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <button
+                    onClick={() => scrollTo('register-section')}
+                    className="px-8 py-4 bg-[#8B5E3C] text-white rounded-xl font-bold text-sm shadow-lg hover:bg-[#7a5234] transition-all flex items-center gap-2 shadow-black/30"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>احجز جناح شركتك الآن واجلب آلاف العملاء</span>
+                  </button>
+                  <button
+                    onClick={() => scrollTo('booth-showcase')}
+                    className="px-8 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-xl font-bold text-sm hover:bg-white/20 transition-all flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    <span>اكتشف مزايا المعرض الإلكتروني</span>
+                  </button>
+                </div>
+                <div className="mt-8 inline-flex items-center gap-2 px-5 py-2 bg-white/5 backdrop-blur-sm rounded-full border border-white/10">
+                  <span className="text-white/50 text-[10px]">نحن لا ننافسك في التصنيع... بل نصبح أقوى قناة تسويق رقمية لعلامتك التجارية</span>
+                </div>
               </div>
-            </div>
+            </section>
 
-          </div>
-
-        </div>
-      </section>
-
-      {/* REAL-TIME LEAD CONTROL PORTAL INTERACTIVE PANEL */}
-      <section id="leads-overview-panel" className="py-20 bg-[#030b1a] border-t border-white/5 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <LeadDashboard />
-      </section>
-
-      {/* EXPECTED METRICS & NUMBERS SECTION */}
-      <section id="stats" className="py-20 bg-[#030b1a] relative border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          
-          <div className="max-w-3xl mx-auto mb-16">
-            <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20">
-              أرقام وحقائق تعكس جدوى المشاركة
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
-              إحصائيات استثنائية تؤكد قوة العائد الاستثماري
-            </h2>
-            <p className="text-white/70 text-xs sm:text-sm mt-2">
-              هذه الأرقام مستندة إلى نتائج دوراتنا السابقة ومتوسط أداء الحملات الإعلانية الموجهة — وتثبت أن منصتنا هي الأكثر فعالية لبيع المطابخ في المنطقة.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {expectedStats.map((stat, idx) => (
-              <div 
-                id={`expected-stat-item-${idx}`}
-                key={idx} 
-                className="bg-white/5 border border-white/10 p-6 rounded-3xl relative overflow-hidden text-center group hover:border-[#8B5E3C]/45 transition-all duration-300 pointer-events-auto"
-              >
-                {/* Accent glow top */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-[#8B5E3C]/40"></div>
-                
-                <div className="font-mono text-3xl sm:text-4xl lg:text-5xl font-black text-[#8B5E3C] tracking-tighter leading-none mb-3">
-                  {stat.value}
-                </div>
-                <div className="text-slate-200 text-sm sm:text-base font-extrabold leading-tight mb-2">
-                  {stat.label}
-                </div>
-                <p className="text-xs text-white/50 leading-relaxed">
-                  {stat.desc}
+            {/* PROBLEM → SOLUTION */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+              <div className="text-center mb-14">
+                <span className="text-xs font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full">
+                  التحديات التي تواجه شركات المطابخ
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-4 mb-3">
+                  كل تحدٍ في سوق المطابخ له حل رقمي
+                </h2>
+                <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+                  معرض إلكتروني متكامل يجلب لشركتك آلاف الزوار والعملاء المحتملين — نوصل منتجك للمشتري الجاد 
+                  في مصر والخليج من خلال جناح افتراضي وحملات تسويقية ذكية.
                 </p>
               </div>
-            ))}
-          </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {problems.map((p, i) => {
+                  const Icon = p.icon;
+                  return (
+                    <div key={i} className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#8B5E3C]/30 hover:-translate-y-1 transition-all duration-300">
+                      <div className={`w-11 h-11 rounded-xl ${p.bg} ${p.color} flex items-center justify-center mb-4`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h3 className="font-extrabold text-slate-900 text-sm mb-2">{p.title}</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">{p.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
 
-        </div>
-      </section>
+            {/* HOW IT WORKS */}
+            <section className="py-20 px-4 sm:px-6 lg:px-8 bg-slate-50 border-t border-slate-100">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-14">
+                  <span className="text-xs font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full">
+                    آلية العمل خطوة بخطوة
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-4 mb-3">
+                    من الاشتراك إلى تحقيق المبيعات — 5 مراحل فقط
+                  </h2>
+                  <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+                    عملية احترافية واضحة ومباشرة. فريقنا المتخصص يتولى كل التفاصيل — من تصميم الجناح الرقمي وإطلاق الحملات 
+                    إلى تسليمك تقارير شاملة بالنتائج والعملاء المحتملين.
+                  </p>
+                </div>
+                <div className="relative">
+                  <div className="hidden lg:block absolute top-16 left-[10%] right-[10%] h-0.5 bg-slate-200"></div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                    {steps.map((step, i) => {
+                      const Icon = step.icon;
+                      return (
+                        <div key={i} className="relative text-center bg-white border border-slate-200 rounded-2xl p-6 hover:border-[#8B5E3C]/30 hover:-translate-y-1 transition-all duration-300">
+                          <div className="w-14 h-14 rounded-full bg-[#8B5E3C] text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#8B5E3C]/20 relative z-10">
+                            <Icon className="w-6 h-6" />
+                          </div>
+                          <span className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[#8B5E3C]/10 text-[#8B5E3C] flex items-center justify-center text-xs font-black">
+                            {step.num}
+                          </span>
+                          <h4 className="font-extrabold text-slate-900 text-sm mb-1">{step.title}</h4>
+                          <p className="text-xs text-slate-500 leading-relaxed">{step.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </section>
 
-      {/* PACKAGES & CALCULATOR SECTION */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20">
-            استثمر بذكاء — اختر باقتك
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-white mt-3">
-            باقات مرنة تناسب جميع شركات المطابخ
-          </h2>
-          <p className="text-white/70 text-xs sm:text-sm mt-2">
-            سواء كنت شركة ناشئة أو علامة تجارية راسخة، لديك باقة تناسب ميزانيتك وطموحك — مع خيارات ترقية مرنة تزيد من وصولك للعملاء:
-          </p>
-        </div>
+            {/* PACKAGES SHOWCASE */}
+            <section id="booth-showcase" className="py-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+              <div className="text-center mb-14">
+                <span className="text-xs font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full">
+                  الباقات والأسعار
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-4 mb-3">
+                  أربع باقات تسويقية متكاملة لشركتك
+                </h2>
+                <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+                  نقدم أربع باقات مرنة تناسب جميع شركات المطابخ — من الشركات الناشئة إلى العلامات التجارية الكبرى. 
+                  كل باقة تتضمن مجموعة من الأجنحة الرقمية والمزايا التسويقية المصممة لتعزيز تواجدك الرقمي وجذب العملاء.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                {PACKAGES.map((pkg) => {
+                  const boothCount = PACKAGE_BOOTHS[pkg.id]?.length || 0;
+                  return (
+                    <button
+                      key={pkg.id}
+                      onClick={() => openPackage(pkg.id)}
+                      className="group bg-white border border-slate-200 rounded-2xl overflow-hidden hover:border-[#8B5E3C]/30 hover:-translate-y-1.5 transition-all duration-300 shadow-sm hover:shadow-md text-right w-full cursor-pointer"
+                    >
+                      <div className="h-40 overflow-hidden relative">
+                        <img src={PACKAGE_IMAGES[pkg.id]} alt={pkg.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                        <div className="absolute bottom-3 right-3 left-3">
+                          <h3 className="font-black text-white text-sm drop-shadow">{pkg.name}</h3>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="bg-white/90 backdrop-blur-sm text-[#8B5E3C] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                              {boothCount} أجنحة
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{pkg.badge}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <span className="text-xs font-bold text-[#8B5E3C] flex items-center gap-1 group-hover:gap-2 transition-all">
+                            <span>تصفح الأجنحة</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </span>
+                          <span className="font-black text-slate-900 text-sm">{pkg.price.toLocaleString()} ج.م</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-        {/* Dynamic pricing list */}
-        <PriceCalculator onSelectPackage={handleSelectPackage} />
+            {/* STATS BANNER */}
+            <section className="py-16 px-4 sm:px-6 lg:px-8 bg-[#8B5E3C]">
+              <div className="max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                  {[
+                    { value: '١٠,٠٠٠+', label: 'مشتري محتمل شهرياً' },
+                    { value: '٨٠+', label: 'شركة مطابخ مشاركة' },
+                    { value: '٥٠٠+', label: 'صفقة متوقعة سنوياً' },
+                    { value: '٩٠٪', label: 'توفير في تكاليف التسويق' },
+                  ].map((s, i) => (
+                    <div key={i} className="text-white">
+                      <div className="text-3xl sm:text-4xl font-black">{s.value}</div>
+                      <div className="text-white/80 text-xs sm:text-sm font-bold mt-1">{s.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
 
-      </section>
+            {/* REGISTRATION */}
+            <section id="register-section" className="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <span className="text-xs font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full">
+                  سجل الآن — العرض محدود
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-4 mb-3">
+                  انضم إلى كبرى شركات المطابخ في المنطقة
+                </h2>
+                <p className="text-slate-500 text-sm max-w-2xl mx-auto">
+                  املأ بيانات شركتك — فريقنا المتخصص يتولى تجهيز جناحك الرقمي بالكامل، إطلاق الحملات التسويقية، 
+                  وتوصيل العملاء المحتملين إليك مباشرة. فرص مشاركة محدودة لضمان الجودة والتميز.
+                </p>
+              </div>
+              <RegistrationSection preSelectedPackageId={selectedPkgId} />
+            </section>
+          </>
+        )}
 
-      {/* EXPANDABLE FAQ SECTION */}
-      <section id="faq" className="py-20 px-4 sm:px-6 lg:px-8">
-        
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs sm:text-sm font-bold text-[#8B5E3C] tracking-widest bg-[#8B5E3C]/10 px-3 py-1 rounded-full border border-[#8B5E3C]/20">
-            كل ما تريد معرفته قبل الاشتراك
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold text-white mt-3">
-            الأسئلة الشائعة — إجابات شفافة وواضحة
-          </h2>
-          <p className="text-white/70 text-xs sm:text-sm mt-2">
-            جمعنا لك هنا أهم الاستفسارات الفنية والتنظيمية لمساعدتك على اتخاذ قرار التسجيل الأمثل لحفظ الصفقات والمقاعد:
-          </p>
-        </div>
-
-        <FAQSection />
-
-      </section>
-
-      {/* REGISTRATION FORM SECTION */}
-      <section id="register-section" className="py-20 bg-white/5 border-t border-white/10 px-4 sm:px-6 lg:px-8 relative rounded-t-3xl">
-        
-        <RegistrationSection preSelectedPackageId={selectedPkgId} />
-
-      </section>
-
-        </>
-      )}
-
-      {/* FOOTER */}
-      <Footer />
-
-    </div>
-  </>
+        <Footer />
+      </div>
+    </>
   );
 }

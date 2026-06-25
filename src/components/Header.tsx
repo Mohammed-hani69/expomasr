@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Calendar, ShieldCheck, ArrowRight, Home } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface HeaderProps {
@@ -13,96 +13,74 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const menuItems = [
     { label: 'الرئيسية', href: '#hero' },
-    { label: 'لماذا تشارك؟', href: '#why-us' },
-    { label: 'كيف يعمل؟', href: '#how-it-works' },
-    { label: 'القطاعات', href: '#sectors' },
-    { label: 'لوحة التحكم والمزامنة', href: '#leads-overview-panel' },
-    { label: 'نموذج الجناح', href: '#booth-showcase' },
-    { label: 'أرقام وحقائق', href: '#stats' },
-    { label: 'الباقات والأسعار', href: '#pricing' },
-    { label: 'الأسئلة الشائعة', href: '#faq' },
+    { label: 'المزايا', href: '#why-us' },
+    { label: 'كيف يعمل', href: '#how-it-works' },
+    { label: 'الأجنحة', href: '#booth-showcase' },
+    { label: 'التسجيل', href: '#register-section' },
   ];
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const element = document.querySelector(href);
-    if (element) {
-      const offset = 85; // header height offset
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+    const el = document.querySelector(href);
+    if (el) {
+      const offset = 85;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
       setIsOpen(false);
     }
   };
 
   return (
     <header
-      id="site-header"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-brand-blue-dark/95 backdrop-blur-md border-b border-brand-blue-light/50 py-3 shadow-xl'
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm'
           : 'bg-transparent py-5'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          
-          {/* Logo & Brand ID */}
-          <div className="flex items-center gap-1.5 xs:gap-3 min-w-0">
-            <div className="relative w-8 h-8 xs:w-11 xs:h-11 bg-gradient-to-br from-[#071329] to-[#030b1a] border border-brand-gold/50 rounded-lg xs:rounded-xl flex items-center justify-center font-black text-brand-gold text-xs xs:text-lg shadow-[0_4px_12px_rgba(212,175,55,0.2)] overflow-hidden shrink-0">
-              <span className="font-extrabold tracking-tighter italic">EM</span>
-              <div className="absolute inset-0 bg-gradient-to-tr from-brand-gold/10 to-transparent pointer-events-none"></div>
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-lg overflow-hidden bg-[#040e24] border border-[#8B5E3C]/30 flex items-center justify-center shrink-0">
+              <img src="/assets/images/icon.png" alt="اكسبو مصر" className="w-full h-full object-contain p-1" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1 xs:gap-1.5 flex-wrap">
-                <span className="text-[7px] xs:text-[9px] font-bold tracking-wider text-brand-gold bg-brand-gold/10 px-1.5 py-0.5 rounded-full border border-brand-gold/20 hidden xs:inline-block">معرض المطابخ 2026</span>
-                <span className="text-[7px] xs:text-[9px] text-emerald-400 font-semibold flex items-center gap-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[8px] font-bold text-[#8B5E3C] bg-[#8B5E3C]/10 px-1.5 py-0.5 rounded-full">اكسبو مصر 2026</span>
+                <span className="text-[8px] text-emerald-600 font-semibold flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                   نشط الآن
                 </span>
               </div>
-              <h1 className="text-[10px] xs:text-xs sm:text-sm md:text-base font-extrabold text-white tracking-tight leading-tight mt-0.5 min-w-0 truncate">
-                معرض <span className="text-brand-gold font-bold">المطابخ الحديثة</span>
+              <h1 className={`text-xs sm:text-sm font-extrabold tracking-tight ${isScrolled ? 'text-slate-900' : 'text-white'}`}>
+                <span className="text-[#8B5E3C]">اكسبو</span> مصر
               </h1>
-              <p className="text-[7px] xs:text-[10px] text-brand-gold/80 font-mono tracking-wider font-semibold mt-px">expomasr.online</p>
             </div>
           </div>
 
-          {/* Desktop Navigation */}
           {currentView === 'booth' ? (
             <div className="hidden lg:flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-400 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-full">
-                نظام استعراض الأجنحة المستقل — <span className="text-brand-gold">{companyName}</span>
+              <span className="text-xs font-bold text-slate-500 bg-slate-100 px-3.5 py-1.5 rounded-full">
+                {companyName}
               </span>
             </div>
           ) : (
-            <nav className="hidden lg:flex items-center space-x-1 space-x-reverse">
+            <nav className="hidden lg:flex items-center gap-1">
               {menuItems.map((item) => (
                 <a
-                  id={`nav-${item.href.replace('#', '')}`}
                   key={item.href}
                   href={item.href}
-                  onClick={(e) => scrollToSection(e, item.href)}
-                  className="px-3 py-1.5 text-xs font-semibold text-white/70 hover:text-[#8B5E3C] transition-colors duration-200 hover:bg-white/5 rounded-full border border-transparent hover:border-white/5"
+                  onClick={(e) => scrollTo(e, item.href)}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-full transition-colors ${
+                    isScrolled ? 'text-slate-600 hover:text-[#8B5E3C] hover:bg-amber-50' : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
                 >
                   {item.label}
                 </a>
@@ -110,91 +88,77 @@ export default function Header({ currentView = 'home', onBack, companyName }: He
             </nav>
           )}
 
-          {/* CTA Box & Mobile Toggle */}
-          <div className="flex items-center gap-1.5 xs:gap-4">
+          <div className="flex items-center gap-2">
             {currentView === 'booth' ? (
               <button
                 onClick={onBack}
-                className="inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-l from-brand-gold to-brand-gold-bright text-[#030b1a] rounded-full font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-brand-gold/15 transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#8B5E3C] text-white rounded-full font-bold text-xs hover:bg-[#7a5234] transition-all cursor-pointer"
               >
-                <ArrowRight className="w-4 h-4 shrink-0" />
-                <span>العودة لساحة المعرض الرئيسية</span>
+                <ArrowRight className="w-4 h-4" />
+                <span>العودة</span>
               </button>
             ) : (
               <>
-                {/* Bento date badge on desktop */}
-                <div className="hidden xl:flex flex-col items-end px-4 border-r border-[#8B5E3C]/20">
-                  <span className="text-[9px] text-white/60 uppercase">الموعد القادم للضخ</span>
-                  <span className="text-xs font-bold text-[#8B5E3C]">سبتمبر 2026</span>
-                </div>
-
                 <a
-                  id="header-cta-button"
                   href="#register-section"
-                  onClick={(e) => scrollToSection(e, '#register-section')}
-                  className="hidden md:inline-flex items-center bg-white text-[#030b1a] px-6 py-2.5 rounded-full font-bold text-xs hover:bg-[#8B5E3C] transition-all duration-300 shadow-md shadow-white/5 cursor-pointer"
+                  onClick={(e) => scrollTo(e, '#register-section')}
+                  className={`hidden md:inline-flex items-center px-5 py-2.5 rounded-full font-bold text-xs transition-all cursor-pointer ${
+                    isScrolled
+                      ? 'bg-[#8B5E3C] text-white hover:bg-[#7a5234]'
+                      : 'bg-white text-slate-900 hover:bg-amber-50'
+                  }`}
                 >
-                  <span>احجز جناحك الآن</span>
+                  احجز جناحك الآن
                 </a>
-
-                {/* Mobile menu button */}
                 <button
-                  id="mobile-menu-toggle"
-                  type="button"
                   onClick={() => setIsOpen(!isOpen)}
-                  className="inline-flex lg:hidden items-center justify-center p-2 rounded-xl text-slate-400 hover:text-white hover:bg-brand-blue-light/70 focus:outline-none transition-all duration-200 border border-slate-700/50"
-                  aria-controls="mobile-menu"
-                  aria-expanded="false"
+                  className={`inline-flex lg:hidden items-center justify-center p-2 rounded-xl transition-all ${
+                    isScrolled ? 'text-slate-600 hover:bg-slate-100' : 'text-white/80 hover:bg-white/10'
+                  }`}
                 >
-                  <span className="sr-only">فتح القائمة</span>
-                  {isOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+                  {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </button>
               </>
             )}
           </div>
-
         </div>
       </div>
 
-      {/* Mobile Menu, show/hide based on menu state */}
       <AnimatePresence>
         {isOpen && currentView !== 'booth' && (
           <motion.div
-            id="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ type: "spring", bounce: 0.05, duration: 0.4 }}
-            className="lg:hidden bg-brand-blue-dark/98 backdrop-blur-lg border-b border-brand-blue-light/80 overflow-hidden shadow-2xl"
+            transition={{ type: 'spring', bounce: 0.05, duration: 0.4 }}
+            className="lg:hidden bg-white border-b border-slate-200 overflow-hidden shadow-lg"
           >
-            <div className="px-4 pt-3 pb-6 space-y-1 sm:px-6">
-              {menuItems.map((item, index) => (
+            <div className="px-4 pt-3 pb-6 space-y-1">
+              {menuItems.map((item, i) => (
                 <motion.a
-                  id={`mobile-nav-${item.href.replace('#', '')}`}
                   key={item.href}
                   href={item.href}
-                  onClick={(e) => scrollToSection(e, item.href)}
+                  onClick={(e) => scrollTo(e, item.href)}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.03 + 0.1 }}
-                  className="block px-4 py-3 rounded-xl text-base font-medium text-slate-300 hover:text-brand-gold hover:bg-white/5 active:bg-white/10 border border-transparent hover:border-white/5 transition-all duration-200"
+                  transition={{ delay: i * 0.03 + 0.1 }}
+                  className="block px-4 py-3 rounded-xl text-sm font-medium text-slate-700 hover:text-[#8B5E3C] hover:bg-amber-50 transition-all"
                 >
                   {item.label}
                 </motion.a>
               ))}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: menuItems.length * 0.03 + 0.15 }}
-                className="pt-4 mt-3 border-t border-white/10 px-4"
+                className="pt-4 mt-3 border-t border-slate-100"
               >
                 <a
-                  id="mobile-header-cta"
                   href="#register-section"
-                  onClick={(e) => scrollToSection(e, '#register-section')}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-full bg-gradient-to-l from-brand-gold to-brand-gold-bright text-[#030b1a] hover:shadow-lg hover:shadow-brand-gold/20 active:scale-[0.98] transition-all text-center font-bold text-sm cursor-pointer"
+                  onClick={(e) => scrollTo(e, '#register-section')}
+                  className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-full bg-[#8B5E3C] text-white font-bold text-sm hover:bg-[#7a5234] transition-all"
                 >
-                  <span>احجز جناحك الآن</span>
+                  احجز جناحك الآن
                 </a>
               </motion.div>
             </div>

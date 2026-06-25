@@ -282,25 +282,17 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
     <div className="max-w-4xl mx-auto">
       
       {activeTab === 'form' ? (
-        <div className="bg-brand-blue-medium border border-brand-blue-light/60 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-          {/* Creative visual backdrop pattern specifically requested behind the booking form */}
-          <div 
-            className="absolute inset-0 z-0 select-none pointer-events-none bg-cover bg-center opacity-[0.14] mix-blend-screen"
-            style={{ backgroundImage: `url(${formBg})` }}
-          />
-          {/* Subtle warm glow underlay */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#8B5E3C]/5 rounded-full blur-3xl pointer-events-none z-0"></div>
-          
-          <div className="text-center mb-8 relative z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-gold/10 border border-brand-gold/20 rounded-full text-brand-gold text-xs font-semibold mb-3">
-              <Sparkles className="w-4 h-4 text-brand-gold animate-spin" />
-              <span>نموذج حجز آمن وموثّق — بياناتك مشفّرة</span>
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm relative">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#8B5E3C]/10 border border-[#8B5E3C]/20 rounded-full text-[#8B5E3C] text-xs font-semibold mb-3">
+              <Sparkles className="w-4 h-4" />
+              <span>نموذج حجز آمن — بياناتك مشفّرة</span>
             </div>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
-              انضم إلى نخبة العارضين وابدأ جني الأرباح
+            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+              سجّل شركتك الآن في المعرض
             </h3>
-            <p className="text-slate-300 text-xs sm:text-sm mt-2 max-w-2xl mx-auto">
-              املأ بياناتك بدقة — سيتولى فريق الدعم الفني لدينا بناء جناحك الرقمي وإطلاق الحملات الإعلانية المموّلة لعلامتك التجارية فور التأكيد.
+            <p className="text-slate-500 text-xs sm:text-sm mt-2 max-w-2xl mx-auto">
+              املأ بياناتك وسيتولى فريقنا بناء جناحك الرقمي وإطلاق الحملات الإعلانية فور التأكيد.
             </p>
           </div>
 
@@ -310,7 +302,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
               
               {/* Company Name */}
               <div id="form-group-companyName">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <Building2 className="w-4 h-4 text-brand-gold" />
                   اسم الشركة (الاسم التجاري الرسمي):
                 </label>
@@ -319,10 +311,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                   value={formData.companyName}
                   onChange={(e) => setFormData({...formData, companyName: e.target.value})}
                   placeholder="مثال: الفراعنة للتشطيب والديكور الفاخر"
-                  className={`w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-1 ${
+                  className={`w-full text-xs sm:text-sm p-3 bg-slate-50 border rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-1 ${
                     errors.companyName 
                       ? 'border-red-500/80 focus:ring-red-500' 
-                      : 'border-brand-blue-light/80 focus:border-brand-gold focus:ring-brand-gold/30'
+                      : 'border-slate-200/80 focus:border-brand-gold focus:ring-brand-gold/30'
                   }`}
                 />
                 {errors.companyName && (
@@ -332,7 +324,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
               {/* Contact Person */}
               <div id="form-group-contactPerson">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <User className="w-4 h-4 text-brand-gold" />
                   اسم المسؤول المكلف بالحوار:
                 </label>
@@ -341,10 +333,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                   value={formData.contactPerson}
                   onChange={(e) => setFormData({...formData, contactPerson: e.target.value})}
                   placeholder="مثال: المهندس أحمد ممدوح"
-                  className={`w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-1 ${
+                  className={`w-full text-xs sm:text-sm p-3 bg-slate-50 border rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:ring-1 ${
                     errors.contactPerson 
                       ? 'border-red-500/80 focus:ring-red-500' 
-                      : 'border-brand-blue-light/80 focus:border-brand-gold focus:ring-brand-gold/30'
+                      : 'border-slate-200/80 focus:border-brand-gold focus:ring-brand-gold/30'
                   }`}
                 />
                 {errors.contactPerson && (
@@ -354,7 +346,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
               {/* Phone Number */}
               <div id="form-group-phone">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <Phone className="w-4 h-4 text-brand-gold" />
                   رقم الهاتف المعتمد (موبايل):
                 </label>
@@ -363,10 +355,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                   value={formData.phone}
                   onChange={(e) => setFormData({...formData, phone: e.target.value})}
                   placeholder="مثال: 01001234567"
-                  className={`w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border rounded-xl text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 ${
+                  className={`w-full text-xs sm:text-sm p-3 bg-slate-50 border rounded-xl text-slate-900 placeholder-slate-500 font-mono focus:outline-none focus:ring-1 ${
                     errors.phone 
                       ? 'border-red-500/80 focus:focus:ring-red-500' 
-                      : 'border-brand-blue-light/80 focus:border-brand-gold focus:ring-brand-gold/30'
+                      : 'border-slate-200/80 focus:border-brand-gold focus:ring-brand-gold/30'
                   }`}
                 />
                 {errors.phone && (
@@ -376,7 +368,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
               {/* WhatsApp Number */}
               <div id="form-group-whatsapp">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <Phone className="w-4 h-4 text-emerald-400" />
                   رقم واتساب المباشر (مستلم العملاء):
                 </label>
@@ -385,10 +377,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                   value={formData.whatsapp}
                   onChange={(e) => setFormData({...formData, whatsapp: e.target.value})}
                   placeholder="مثال: 01221234567"
-                  className={`w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border rounded-xl text-white placeholder-slate-500 font-mono focus:outline-none focus:ring-1 ${
+                  className={`w-full text-xs sm:text-sm p-3 bg-slate-50 border rounded-xl text-slate-900 placeholder-slate-500 font-mono focus:outline-none focus:ring-1 ${
                     errors.whatsapp 
                       ? 'border-red-500/80 focus:ring-red-500' 
-                      : 'border-brand-blue-light/80 focus:border-brand-gold focus:ring-brand-gold/30'
+                      : 'border-slate-200/80 focus:border-brand-gold focus:ring-brand-gold/30'
                   }`}
                 />
                 {errors.whatsapp && (
@@ -398,7 +390,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
               {/* City (Manual Input & Optional) */}
               <div id="form-group-city" className="md:col-span-2">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <MapPin className="w-4 h-4 text-brand-gold" />
                   المدينة / محافظة المقر <span className="text-slate-500 font-normal text-xs">(اختياري - كتابة يدوية)</span>:
                 </label>
@@ -407,20 +399,20 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
                   placeholder="مثال: القاهرة، الجيزة، الإسكندرية (أو اتركه فارغاً)"
-                  className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 text-right"
+                  className="w-full text-xs sm:text-sm p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-600 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 text-right"
                 />
               </div>
 
               {/* Sector */}
               <div id="form-group-sector">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <Briefcase className="w-4 h-4 text-brand-gold" />
                   نوع النشاط والقطاع الرئيسي بالمعرض:
                 </label>
                 <select
                   value={formData.sector}
                   onChange={(e) => setFormData({...formData, sector: e.target.value})}
-                  className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30"
+                  className="w-full text-xs sm:text-sm p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-900 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30"
                 >
                   {SECTORS.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
@@ -430,14 +422,14 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
               {/* Selected Package */}
               <div id="form-group-selectedPackage">
-                <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
                   <Layers className="w-4 h-4 text-brand-gold" />
                   الباقة التسويقية المطلوبة:
                 </label>
                 <select
                   value={formData.selectedPackage}
                   onChange={(e) => setFormData({...formData, selectedPackage: e.target.value})}
-                  className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 text-right"
+                  className="w-full text-xs sm:text-sm p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-900 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 text-right"
                 >
                   {PACKAGES.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -451,7 +443,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
             {/* Additional Message */}
             <div id="form-group-message">
-              <label className="block text-xs sm:text-sm font-bold text-slate-300 mb-1.5">
+              <label className="block text-xs sm:text-sm font-bold text-slate-700 mb-1.5">
                 تفاصيل إضافية أو ميزات تود إضافتها لجناحك الافتراضي:
               </label>
               <textarea 
@@ -459,7 +451,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
                 placeholder="مثال: تفاصيل عن سابقة أعمالنا في تشطيب الفلل الإدارية أو ميزات خاصة بالمطابخ والأثاث تود دمجها..."
-                className="w-full text-xs sm:text-sm p-3 bg-brand-blue-dark border border-brand-blue-light/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 resize-none"
+                className="w-full text-xs sm:text-sm p-3 bg-slate-50 border border-slate-200/80 rounded-xl text-slate-900 placeholder-slate-500 focus:outline-none focus:border-brand-gold focus:ring-1 focus:ring-brand-gold/30 resize-none"
               ></textarea>
             </div>
 
@@ -472,7 +464,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                 onChange={(e) => setFormData({...formData, acceptTerms: e.target.checked})}
                 className="accent-brand-gold w-4 h-4 mt-0.5 cursor-pointer"
               />
-              <label htmlFor="acceptTerms" className="text-xs text-slate-300 cursor-pointer select-none leading-relaxed">
+              <label htmlFor="acceptTerms" className="text-xs text-slate-700 cursor-pointer select-none leading-relaxed">
                 أوافق بالكامل على قواعد الاشتراك والتفاعل مع العملاء حياً، وألتزم بتقديم صور حقيقية لمشاريع الشركة السابقة دون غش أو تزييف.
               </label>
             </div>
@@ -506,32 +498,31 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
         </div>
       ) : (
         /* SAVED TICKET PREVIEW SUCCESS PANEL */
-        <div className="bg-brand-blue-medium border border-brand-blue-light/60 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden animate-fade-in">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm relative animate-fade-in">
           
-          {/* Confetti styling effect */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 via-brand-gold to-emerald-500"></div>
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-red-500 via-[#8B5E3C] to-emerald-500"></div>
           
           <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-tr from-brand-gold to-brand-gold-bright text-brand-blue-dark font-black rounded-full flex items-center justify-center mx-auto shadow-lg shadow-brand-gold/15 animate-bounce mb-3">
-              <CheckCircle className="w-10 h-10 text-brand-blue-dark" />
+            <div className="w-16 h-16 bg-[#8B5E3C] text-white font-black rounded-full flex items-center justify-center mx-auto shadow-lg mb-3">
+              <CheckCircle className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-2xl sm:text-3xl font-black text-white">مبروك! تم حجز جناحك الرقمي بنجاح</h3>
-            <p className="text-brand-gold text-xs sm:text-sm font-bold mt-1">
+            <h3 className="text-2xl sm:text-3xl font-black text-slate-900">مبروك! تم حجز جناحك الرقمي بنجاح</h3>
+            <p className="text-[#8B5E3C] text-xs sm:text-sm font-bold mt-1">
               تحتفظ رخصة المتصفح برمز وتذكرة الاشتراك لعام 2026 التالية:
             </p>
           </div>
 
           {/* Ticket layout */}
-          <div ref={ticketRef} className="relative max-w-lg mx-auto bg-brand-blue-dark border border-brand-gold/30 rounded-2xl p-6 shadow-xl space-y-6">
+          <div ref={ticketRef} className="relative max-w-lg mx-auto bg-slate-50 border border-brand-gold/30 rounded-2xl p-6 shadow-xl space-y-6">
             
             {/* Ticket Header background pattern */}
-            <div className="flex items-center justify-between border-b border-brand-blue-light pb-4">
+            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-brand-gold flex items-center justify-center text-brand-blue-dark">
                   <Calendar className="w-4 h-4 text-brand-blue-dark font-black" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-black text-white">البوابة الرقمية الرسمية</h4>
+                  <h4 className="text-xs font-black text-slate-900">البوابة الرقمية الرسمية</h4>
                   <p className="text-[10px] text-slate-400 font-sans">Digital Expo 2026 Official Ticket</p>
                 </div>
               </div>
@@ -547,26 +538,26 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-slate-400 block text-[10px]">الشركة المشتركة:</span>
-                  <strong className="text-sm text-white font-bold block mt-0.5">{savedTicket?.companyName}</strong>
+                  <strong className="text-sm text-slate-900 font-bold block mt-0.5">{savedTicket?.companyName}</strong>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">المسؤول الممثل للشركة:</span>
-                  <strong className="text-sm text-slate-200 block mt-0.5">{savedTicket?.contactPerson}</strong>
+                  <strong className="text-sm text-slate-900 block mt-0.5">{savedTicket?.contactPerson}</strong>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-brand-blue-light/50 pt-3">
+              <div className="grid grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
                 <div>
                   <span className="text-slate-400 block text-[10px]">التصنيف والقطاع الأساسي:</span>
-                  <strong className="text-slate-200 block mt-0.5">{savedTicket?.sector}</strong>
+                  <strong className="text-slate-900 block mt-0.5">{savedTicket?.sector}</strong>
                 </div>
                 <div>
                   <span className="text-slate-400 block text-[10px]">المظهر والمدينة:</span>
-                  <strong className="text-slate-200 block mt-0.5">{savedTicket?.city}</strong>
+                  <strong className="text-slate-900 block mt-0.5">{savedTicket?.city}</strong>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-brand-blue-light/50 pt-3">
+              <div className="grid grid-cols-2 gap-4 border-t border-slate-200/50 pt-3">
                 <div>
                   <span className="text-slate-400 block text-[10px]">الباقة التسويقية العريضة:</span>
                   <strong className="text-brand-gold font-black block mt-0.5">{savedTicket?.selectedPackage}</strong>
@@ -579,10 +570,10 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                 </div>
               </div>
 
-              <div className="border-t border-brand-blue-light/50 pt-3 flex items-center justify-between gap-4">
+              <div className="border-t border-slate-200/50 pt-3 flex items-center justify-between gap-4">
                 <div>
                   <span className="text-slate-400 block text-[10px]">تاريخ الحجز المعتمد:</span>
-                  <span className="text-slate-300 font-semibold block mt-0.5 leading-tight">{savedTicket?.date}</span>
+                  <span className="text-slate-700 font-semibold block mt-0.5 leading-tight">{savedTicket?.date}</span>
                   <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-2 font-bold">
                     <Clock className="w-3 h-3 text-emerald-400" />
                     المقعد محجوز بدفعة معلّقة
@@ -626,7 +617,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
 
             <button
               onClick={handleReset}
-              className="w-full sm:w-auto px-6 py-3 bg-brand-blue-light/50 border border-brand-blue-light text-slate-300 text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-brand-blue-light hover:text-white transition-all cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-slate-200 hover:text-slate-900 transition-all cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
               <span>حجز جناح لشركة أخرى</span>
@@ -643,15 +634,15 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
       {/* Custom Modal */}
       {modalState.type && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-brand-blue-dark border border-brand-gold/30 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl animate-in fade-in zoom-in-95">
+          <div className="bg-slate-50 border border-brand-gold/30 rounded-2xl p-6 sm:p-8 max-w-md w-full mx-4 shadow-2xl animate-in fade-in zoom-in-95">
             {/* Header */}
             <div className="mb-4">
-              <h2 className="text-xl sm:text-2xl font-black text-white">{modalState.title}</h2>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">{modalState.title}</h2>
             </div>
 
             {/* Message */}
             <div className="mb-6">
-              <p className="text-slate-300 text-sm sm:text-base whitespace-pre-line leading-relaxed">
+              <p className="text-slate-700 text-sm sm:text-base whitespace-pre-line leading-relaxed">
                 {modalState.message}
               </p>
             </div>
@@ -662,7 +653,7 @@ export default function RegistrationSection({ preSelectedPackageId }: Registrati
                 <>
                   <button
                     onClick={() => setModalState({ type: null, title: '', message: '' })}
-                    className="px-4 py-2 bg-brand-blue-light/50 border border-brand-blue-light text-slate-300 text-xs font-bold rounded-lg hover:bg-brand-blue-light hover:text-white transition-all"
+                    className="px-4 py-2 bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-200 hover:text-slate-900 transition-all"
                   >
                     إلغاء
                   </button>
